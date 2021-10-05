@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<head>    
+    <title>Fantastic Five Trading Sandbox!!!</title>
+    <style>
+        body {
+            text-align: center;
+        }
+    </style>
+</head>
+  {% block head %}
+  {% endblock %}
+</head>
+
+<body>
+  <a href="{% url 'home' %}">Crypto Sandbox</a>
+  <h1>Welcome to Crytpo Trading Sandbox!</h1>
+  {% block content %}
+  {% endblock %}
+</body>
