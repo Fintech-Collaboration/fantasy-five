@@ -1,16 +1,18 @@
 import pandas as pd
 
-from django.shortcuts     import render
-from django.views.generic import ListView
+from django.shortcuts               import render
+from django.views.generic           import ListView
+from django.views.generic.edit      import CreateView, DeleteView, UpdateView
+
+from .models import Owner, Portfolio
 
 from pathlib           import Path
 from plotly.offline    import plot
 from plotly.graph_objs import Scatter
 
-from crypto_trader.sandbox.models import Member
-
 
 TEST_DATA = r"C:\Users\JasonGarcia24\FINTECH\workspace\fantasy-five\data\latest-quotes_data_ALL.csv"
+
 
 def home(request):
     ticker    = "BTC"
@@ -24,7 +26,7 @@ def home(request):
         "coin_icon": coin_icon,
         "coin_plot": coin_plot,
     }
-    return render(request, "sandbox/home.html", context=context)
+    return render(request, "sandbox/home.html", context)
 
 
 def icon_path(ticker):   
@@ -75,5 +77,43 @@ def coin_config(ticker):
     return coin_dict[ticker]["name"]
 
 
-class MemberDashboard(ListView):
-    model = Member
+class OwnerList(ListView):
+  model = Owner
+
+
+class PortfolioList(ListView):
+  model = Portfolio
+
+
+class OwnerCreate(CreateView):
+  model = Owner
+  template_name = "vetoffice/owner_create_form.html"
+  fields = ["username", "first_name", "last_name", "email"]
+
+
+class PortfolioCreate(CreateView):
+  model = Portfolio
+  template_name = "vetoffice/portfolio_create_form.html"
+  fields = ["coin", "coin_count", "owner"]
+
+
+class OwnerUpdate(UpdateView):
+  model = Owner
+  template_name = "vetoffice/owner_update_form.html"
+  fields = ["username", "first_name", "last_name", "email"]
+
+
+class PortfolioUpdate(UpdateView):
+  model = Portfolio
+  template_name = "vetoffice/portfolio_update_form.html"
+  fields = ["coin", "coin_count", "owner"]
+
+
+class OwnerDelete(DeleteView):
+  model = Owner
+  template_name = "vetoffice/owner_delete_form.html"
+
+
+class PortfolioDelete(DeleteView):
+  model = Portfolio
+  template_name = "vetoffice/portfolio_delete_form.html"

@@ -1,14 +1,23 @@
 from django.db import models
 
 
-class Member(models.Model):
+# Create our Member model
+class Owner(models.Model):
+    # Declare object attributes in our schema (define schema)
+    username   = models.CharField(max_length=60)
     first_name = models.CharField(max_length=30)
     last_name  = models.CharField(max_length=30)
-    phone      = models.CharField(max_length=30)
+    email      = models.CharField(max_length=60)
 
     def get_absolute_url(self):
         return '/member/list'
 
     def __str__(self):
-        return self.first_name + " " + self.last_name
+        return f"{self.first_name} {self.last_name} ({self.username})"
+
+
+class Portfolio(models.Model):
+    coin       = models.CharField(max_length=15)
+    coin_count = models.DecimalField(max_digits=15, decimal_places=6)
+    owner      = models.ForeignKey(Owner, on_delete=models.CASCADE)
 
