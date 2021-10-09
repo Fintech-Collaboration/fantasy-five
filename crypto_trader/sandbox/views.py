@@ -1,11 +1,16 @@
+import os
+from django.http.response import HttpResponse
+
 import pandas as pd
 
 from .config.coin import coin_references, icon_path
 
 from django.urls                    import reverse_lazy
-from django.shortcuts               import render
+from django.shortcuts               import render, redirect
+from django.contrib.auth            import authenticate, login
 from django.views.generic           import ListView
 from django.views.generic.edit      import CreateView, DeleteView, UpdateView
+from django.http                    import HttpResponse
 
 from .models import Owner, Portfolio
 
@@ -14,7 +19,27 @@ from plotly.offline    import plot
 from plotly.graph_objs import Scatter
 
 
-TEST_DATA = r"C:\Users\JasonGarcia24\FINTECH\workspace\fantasy-five\data\latest-quotes_data_ALL.csv"
+DATA_PATH = "../data/archive"
+TEST_DATA = lambda t: os.path.join(DATA_PATH, f"{coin_references(t)}_5_year.csv")
+
+
+def login_view(request):
+    context = {
+        "login_view": "active",
+    }
+
+    if request.method == "POST":
+        username = request.POST["username"]
+        password = request.POST["password"]
+        user     = authenticate(request, username=username, password=password)
+
+        if user is not None:
+            login(request, user)
+            return redirect("home")
+        else:
+            render(request, "registration/login.html", context)
+
+    return render(request, "registration/login.html", context)
 
 
 def home(request):
@@ -34,21 +59,20 @@ def home(request):
 
 def line_plot(ticker):
     df = pd.read_csv(
-        Path(TEST_DATA),
-        index_col="last_updated",
+        Path(TEST_DATA(ticker)),
+        index_col=f"{ticker.lower()}_start_date",
         parse_dates=True,
         infer_datetime_format=True,
     )
 
-    df_btc = df.loc[df["symbol"]==ticker]
-    x_data = df_btc.index
-    y_data = df_btc["quote.USD.price"]
+    x_data = df.index
+    y_data = df["price_close"]
 
     plt = plot([Scatter(
         x=x_data,
         y=y_data,
         mode='lines',
-        name='BTC',
+        name=ticker.upper(),
         opacity=0.8,
         marker_color='green',
     )],
@@ -58,30 +82,30 @@ def line_plot(ticker):
 
 
 class OwnerList(ListView):
-  model = Owner
+    model = Owner
 
 
 class PortfolioList(ListView):
-  model = Portfolio
+    model = Portfolio
 
 
 class OwnerCreate(CreateView):
-  model         = Owner
-  template_name = "sandbox/owner_create_form.html"
-  fields        = ["username", "first_name", "last_name", "email"]
-  success_url   = reverse_lazy("ownerlist")
+    model         = Owner
+    template_name = "sandbox/owner_create_form.html"
+    fields        = ["username", "first_name", "last_name", "email"]
+    success_url   = reverse_lazy("ownerlist")
 
 class PortfolioCreate(CreateView):
-  model         = Portfolio
-  template_name = "sandbox/portfolio_create_form.html"
-  fields        = ["coin_list", "investment", "balance", "owner"]
-  success_url   = reverse_lazy("portfoliolist")
+    model         = Portfolio
+    template_name = "sandbox/portfolio_create_form.html"
+    fields        = ["coin_list", "investment", "balance", "owner"]
+    success_url   = reverse_lazy("portfoliolist")
 
 
 class OwnerUpdate(UpdateView):
-  model         = Owner
-  template_name = "sandbox/owner_update_form.html"
-  fields        = ["username", "first_name", "last_name", "email"]
+    model         = Owner
+    template_name = "sandbox/owner_update_form.html"
+fields        = ["username", "first_name", "last_name", "email"]
 
 
 class PortfolioUpdate(UpdateView):
@@ -91,13 +115,13 @@ class PortfolioUpdate(UpdateView):
 
 
 class OwnerDelete(DeleteView):
-  model         = Owner
-  template_name = "sandbox/owner_delete_form.html"
-  success_url   = reverse_lazy("ownerlist")
+    model         = Owner
+    template_name = "sandbox/owner_delete_form.html"
+    success_url   = reverse_lazy("ownerlist")
 
 
 class PortfolioDelete(DeleteView):
-  model         = Portfolio
-  template_name = "sandbox/portfolio_delete_form.html"
-  success_url   = reverse_lazy("portfoliolist")
+    model         = Portfolio
+    template_name = "sandbox/portfolio_delete_form.html"
+    success_url   = reverse_lazy("portfoliolist")
   
