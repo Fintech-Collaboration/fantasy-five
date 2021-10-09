@@ -7,10 +7,11 @@ from .config.coin import coin_references, icon_path
 
 from django.urls                    import reverse_lazy
 from django.shortcuts               import render, redirect
-from django.contrib.auth            import authenticate, login
+from django.contrib.auth.mixins     import LoginRequiredMixin
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth            import authenticate, login, logout
 from django.views.generic           import ListView
 from django.views.generic.edit      import CreateView, DeleteView, UpdateView
-from django.http                    import HttpResponse
 
 from .models import Owner, Portfolio
 
@@ -40,6 +41,11 @@ def login_view(request):
             render(request, "registration/login.html", context)
 
     return render(request, "registration/login.html", context)
+
+
+def logout_view(request):
+    logout(request)
+    return redirect("home")
 
 
 def home(request):
@@ -89,38 +95,38 @@ class PortfolioList(ListView):
     model = Portfolio
 
 
-class OwnerCreate(CreateView):
+class OwnerCreate(LoginRequiredMixin, CreateView):
     model         = Owner
     template_name = "sandbox/owner_create_form.html"
     fields        = ["username", "first_name", "last_name", "email"]
     success_url   = reverse_lazy("ownerlist")
 
-class PortfolioCreate(CreateView):
+class PortfolioCreate(LoginRequiredMixin, CreateView):
     model         = Portfolio
     template_name = "sandbox/portfolio_create_form.html"
     fields        = ["coin_list", "investment", "balance", "owner"]
     success_url   = reverse_lazy("portfoliolist")
 
 
-class OwnerUpdate(UpdateView):
+class OwnerUpdate(LoginRequiredMixin, UpdateView):
     model         = Owner
     template_name = "sandbox/owner_update_form.html"
 fields        = ["username", "first_name", "last_name", "email"]
 
 
-class PortfolioUpdate(UpdateView):
+class PortfolioUpdate(LoginRequiredMixin, UpdateView):
   model         = Portfolio
   template_name = "sandbox/portfolio_update_form.html"
   fields        = ["coin_list", "investment", "balance", "owner"]
 
 
-class OwnerDelete(DeleteView):
+class OwnerDelete(LoginRequiredMixin, DeleteView):
     model         = Owner
     template_name = "sandbox/owner_delete_form.html"
     success_url   = reverse_lazy("ownerlist")
 
 
-class PortfolioDelete(DeleteView):
+class PortfolioDelete(LoginRequiredMixin, DeleteView):
     model         = Portfolio
     template_name = "sandbox/portfolio_delete_form.html"
     success_url   = reverse_lazy("portfoliolist")

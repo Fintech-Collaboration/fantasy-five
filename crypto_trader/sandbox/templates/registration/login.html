@@ -1,13 +1,26 @@
-{% block content %}
-<h1>Log in!</h1>
-<form method="post" action="{% url 'login' %}">
-    {% csrf_token %}
-    <label for="username">Username:</label>
-    <input type="text" name="username" placeholder="Username">
+<head>
+    <style>
+    body {
+        font-family: Arial;
+    }
+    input[type=submit]{
+        background-color: #4CAF50;
+        color: white;
+        padding: 14px 20px;
+        margin: 8px 0;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
     
-    <label for="password">Password:</label>
-    <input type="password" name="password" placeholder="Password">
-    <input type="submit" name="" value="Login">
-</form>
-{% endblock %}
-
+    </style>
+    </head>
+        <h2>Please login</h2>
+    <form class="login" method="post">
+        <div>
+          {% csrf_token %}
+          {{ form.as_p }}
+          <input type="submit" value="Login"/>
+        </div>
+    </form>
+    
