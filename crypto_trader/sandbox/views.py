@@ -1,5 +1,7 @@
 import pandas as pd
 
+from .config.coin import coin_references, icon_path
+
 from django.urls                    import reverse_lazy
 from django.shortcuts               import render
 from django.views.generic           import ListView
@@ -17,7 +19,7 @@ TEST_DATA = r"C:\Users\JasonGarcia24\FINTECH\workspace\fantasy-five\data\latest-
 
 def home(request):
     ticker    = "BTC"
-    coin_name = coin_config(ticker)
+    coin_name = coin_references(ticker)
     coin_icon = icon_path(ticker)
     coin_plot = line_plot(ticker)
 
@@ -28,10 +30,6 @@ def home(request):
         "coin_plot": coin_plot,
     }
     return render(request, "sandbox/home.html", context)
-
-
-def icon_path(ticker):   
-    return f"img/{ticker.lower()}-icon-64x64.png"    
 
 
 def line_plot(ticker):
@@ -59,25 +57,6 @@ def line_plot(ticker):
     return plt
 
 
-def coin_config(ticker):
-    coin_dict = {
-        "AAVE": {"name": "Aave"},
-        "ADA":  {"name": "Cardano"},
-        "ANT":  {"name": "Aragon"},
-        "ATOM": {"name": "Cosmos"},
-        "BAL":  {"name": "Balancer"},
-        "BTC":  {"name": "Bitcoin"},
-        "CQT":  {"name": "Covalent"},
-        "ETC":  {"name": "Ethereum Classic"},
-        "ETH":  {"name": "Ethereum"},
-        "KAR":  {"name": "Karura"},
-        "USDT": {"name": "Tether"},
-        "XRP":  {"name": "Ripple"}
-    }
-
-    return coin_dict[ticker]["name"]
-
-
 class OwnerList(ListView):
   model = Owner
 
@@ -87,35 +66,38 @@ class PortfolioList(ListView):
 
 
 class OwnerCreate(CreateView):
-  model = Owner
+  model         = Owner
   template_name = "sandbox/owner_create_form.html"
-  fields = ["username", "first_name", "last_name", "email"]
-
+  fields        = ["username", "first_name", "last_name", "email"]
+  success_url   = reverse_lazy("ownerlist")
 
 class PortfolioCreate(CreateView):
-  model = Portfolio
+  model         = Portfolio
   template_name = "sandbox/portfolio_create_form.html"
-  fields = ["coin", "coin_count", "owner"]
+  fields        = ["coin_list", "investment", "balance", "owner"]
+  success_url   = reverse_lazy("portfoliolist")
 
 
 class OwnerUpdate(UpdateView):
-  model = Owner
+  model         = Owner
   template_name = "sandbox/owner_update_form.html"
-  fields = ["username", "first_name", "last_name", "email"]
+  fields        = ["username", "first_name", "last_name", "email"]
 
 
 class PortfolioUpdate(UpdateView):
-  model = Portfolio
+  model         = Portfolio
   template_name = "sandbox/portfolio_update_form.html"
-  fields = ["coin", "coin_count", "owner"]
+  fields        = ["coin_list", "investment", "balance", "owner"]
 
 
 class OwnerDelete(DeleteView):
-  model = Owner
+  model         = Owner
   template_name = "sandbox/owner_delete_form.html"
   success_url   = reverse_lazy("ownerlist")
 
 
 class PortfolioDelete(DeleteView):
-  model = Portfolio
+  model         = Portfolio
   template_name = "sandbox/portfolio_delete_form.html"
+  success_url   = reverse_lazy("portfoliolist")
+  

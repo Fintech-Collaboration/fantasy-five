@@ -1,19 +1,21 @@
 {% extends './base.html' %}
 {% block content %}
-<h2>Patient List</h2>
+<h2>Portfolio List</h2>
 <a href="{% url 'portfoliocreate' %}"><button class="btn">Add Portfolio</button></a>
 <table id="portfolio">
   <tr>
-    <th>Coin</th>
-    <th>Count</th>
+    <th>Coins</th>
+    <th>Investment</th>
+    <th>Balance</th>
     <th>Owner</th>
       <th> </th>
       <th> </th>
   </tr>
   {% for portfolio in portfolio_list %}
   <tr>
-      <td>{{ portfolio.coin }}</td>
-      <td>{{ portfolio.coin_count }}</td>
+      <td>{{ portfolio.coin_list }}</td>
+      <td>{{ portfolio.investment }}</td>
+      <td>{{ portfolio.balance }}</td>
       <td>{{ portfolio.owner.first_name }} {{ portfolio.owner.last_name}}</td>
       <td><a href="{% url 'portfolioupdate' portfolio.id %}"><button>Edit</button></a></td>
       <td><a href="{% url 'portfoliodelete' portfolio.id %}"><button>Delete</button></a></td>
