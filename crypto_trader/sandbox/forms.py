@@ -1,10 +1,9 @@
 from django  import forms
-from .models import Member
+from .models import Owner
 
 
-class MemberUpdateForm(forms.ModelForm):
-    # Form for updating members
+class TestForm(forms.ModelForm):
     class Meta:
-        model  = Member
-        fields = ('first_name', 'last_name', 'phone',)
+        model  = Owner
+        fields = ("__all__")
 

@@ -9,7 +9,8 @@ from django.urls                    import reverse_lazy
 from django.shortcuts               import render, redirect
 from django.contrib.auth.mixins     import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth            import authenticate, login, logout
+from django.contrib.auth            import logout
+from django.contrib.auth.forms      import UserCreationForm
 from django.views.generic           import ListView
 from django.views.generic.edit      import CreateView, DeleteView, UpdateView
 
@@ -22,25 +23,6 @@ from plotly.graph_objs import Scatter
 
 DATA_PATH = "../data/archive"
 TEST_DATA = lambda t: os.path.join(DATA_PATH, f"{coin_references(t)}_5_year.csv")
-
-
-def login_view(request):
-    context = {
-        "login_view": "active",
-    }
-
-    if request.method == "POST":
-        username = request.POST["username"]
-        password = request.POST["password"]
-        user     = authenticate(request, username=username, password=password)
-
-        if user is not None:
-            login(request, user)
-            return redirect("home")
-        else:
-            render(request, "registration/login.html", context)
-
-    return render(request, "registration/login.html", context)
 
 
 def logout_view(request):
@@ -85,6 +67,12 @@ def line_plot(ticker):
     output_type='div')  
 
     return plt
+
+
+class SignUp(CreateView):
+    form_class    = UserCreationForm
+    success_url   = reverse_lazy("login")
+    template_name = "registration/signup.html"
 
 
 class OwnerList(ListView):
