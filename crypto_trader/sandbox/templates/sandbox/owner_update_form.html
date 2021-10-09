@@ -4,7 +4,7 @@
 <form method="post">
 <div>
   {% csrf_token %} {{ form.as_p }}
-  <input type="submit" value="Submit" />
+  <a href="{% url 'ownerupdate' owner.id %}"><button>Submit</button></a>
 </div>
 </form>
 {% endblock %}

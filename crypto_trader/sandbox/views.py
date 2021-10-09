@@ -1,5 +1,6 @@
 import pandas as pd
 
+from django.urls                    import reverse_lazy
 from django.shortcuts               import render
 from django.views.generic           import ListView
 from django.views.generic.edit      import CreateView, DeleteView, UpdateView
@@ -87,33 +88,34 @@ class PortfolioList(ListView):
 
 class OwnerCreate(CreateView):
   model = Owner
-  template_name = "vetoffice/owner_create_form.html"
+  template_name = "sandbox/owner_create_form.html"
   fields = ["username", "first_name", "last_name", "email"]
 
 
 class PortfolioCreate(CreateView):
   model = Portfolio
-  template_name = "vetoffice/portfolio_create_form.html"
+  template_name = "sandbox/portfolio_create_form.html"
   fields = ["coin", "coin_count", "owner"]
 
 
 class OwnerUpdate(UpdateView):
   model = Owner
-  template_name = "vetoffice/owner_update_form.html"
+  template_name = "sandbox/owner_update_form.html"
   fields = ["username", "first_name", "last_name", "email"]
 
 
 class PortfolioUpdate(UpdateView):
   model = Portfolio
-  template_name = "vetoffice/portfolio_update_form.html"
+  template_name = "sandbox/portfolio_update_form.html"
   fields = ["coin", "coin_count", "owner"]
 
 
 class OwnerDelete(DeleteView):
   model = Owner
-  template_name = "vetoffice/owner_delete_form.html"
+  template_name = "sandbox/owner_delete_form.html"
+  success_url   = reverse_lazy("ownerlist")
 
 
 class PortfolioDelete(DeleteView):
   model = Portfolio
-  template_name = "vetoffice/portfolio_delete_form.html"
+  template_name = "sandbox/portfolio_delete_form.html"

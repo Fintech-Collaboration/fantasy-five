@@ -10,7 +10,7 @@ class Owner(models.Model):
     email      = models.CharField(max_length=60)
 
     def get_absolute_url(self):
-        return '/member/list'
+        return '/owner/list'
 
     def __str__(self):
         return f"{self.first_name} {self.last_name} ({self.username})"
@@ -18,6 +18,6 @@ class Owner(models.Model):
 
 class Portfolio(models.Model):
     coin       = models.CharField(max_length=15)
-    coin_count = models.DecimalField(max_digits=15, decimal_places=6)
+    coin_count = models.FloatField()
     owner      = models.ForeignKey(Owner, on_delete=models.CASCADE)
 
