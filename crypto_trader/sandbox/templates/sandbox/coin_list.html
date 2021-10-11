@@ -18,7 +18,7 @@
   </tr> 
   {% for coin in coin_data|dictsort:"price_close" %}
   <tr>
-    <td>{{ coin.ticker }}</td>
+    <td><a href="{% url 'coinselect' coin.name|cut:" " %}">{{ coin.ticker }}</a></td>
     <td>{{ coin.name }}</td>
     <td>${{ coin.price_open }}</td>
     <td>${{ coin.price_high }}</td>

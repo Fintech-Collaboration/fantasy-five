@@ -1,5 +1,4 @@
 from django  import forms
-from django.db.models import fields
 from .models import Owner, Portfolio
 
 from django.contrib.auth.mixins import LoginRequiredMixin

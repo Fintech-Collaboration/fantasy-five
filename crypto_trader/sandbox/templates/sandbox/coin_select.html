@@ -1,0 +1,33 @@
+{% extends './coinbase.html' %}
+{% load static %}
+
+<DOCTYPE html>
+<html lang="en">
+  <body>
+  {% block content %}
+    <br><br>
+    <center><table id="coins">
+      <tr>
+        <th>Date</th>
+        <th>Open (USD)</th>
+        <th>24HR High (USD)</th>
+        <th>24HR Low</th>
+        <th>Close (USD)</th>
+        <th>Volume</th>
+        <th>Trades</th>
+      </tr> 
+      {% for start_date, price_open, price_high, price_low, price_close, volume_traded, trades_count in coin_data %}
+      <tr>
+        <td>{{ start_date|date:"Y-M-d" }}</td>
+        <td>{{ price_open|floatformat:"2" }}</td>
+        <td>{{ price_high|floatformat:"2" }}</td>
+        <td>{{ price_low|floatformat:"2" }}</td>
+        <td>{{ price_close|floatformat:"2" }}</td>
+        <td>{{ volume_traded|floatformat:"0" }}</td>
+        <td>{{ trades_count|floatformat:"0" }}</td>
+      </tr>
+      {% endfor %}
+    </table></center>
+  </body>
+  {% endblock %}
+</html>

@@ -122,22 +122,6 @@ class Tezos(Coin):
         return self.start_date
 
 
-COIN_MODELS = [
-    Aave,
-    Aragon,
-    Augur,
-    Balancer,
-    Bitcoin,
-    Cardano,
-    Cosmos,
-    Ethereum,
-    EthereumClassic,
-    Orchid,
-    Tether,
-    Tezos,
-]
-
-
 class Portfolio(models.Model):
     choices = [(cm.__ticker__.upper(), cm.__name__) for cm in Coin.__subclasses__()]
 

@@ -10,13 +10,14 @@ from django.contrib.auth.forms      import UserCreationForm
 from django.views.generic           import ListView
 from django.views.generic.edit      import CreateView, DeleteView, UpdateView
 
+from django.http import Http404
+
 from .utils.coin import icon_path, get_coin_data
 
 from .models import (
     Owner,
     Portfolio,
     Coin,
-    COIN_MODELS,
 )
 
 from .forms  import (
@@ -26,8 +27,9 @@ from .forms  import (
     PortfolioUpdateForm,
 )
 
-COIN      = "bitcoin"
-USE_MODEL = next(filter(lambda m: m.__name__.lower() == COIN, COIN_MODELS))
+COIN        = "bitcoin"
+COIN_MODELS = Coin.__subclasses__()
+USE_MODEL   = next(filter(lambda m: m.__name__.lower() == COIN, COIN_MODELS))
 
 def logout_view(request):
     logout(request)
@@ -71,7 +73,7 @@ def line_plot():
     return plt
 
 
-def coin_data(request):
+def coin_table(request):
     coin_data = []
     for coin in COIN_MODELS:
         coin_data.append(dict(
@@ -87,7 +89,33 @@ def coin_data(request):
 
         context = {"coin_data": coin_data}
         
-    return render(request, 'sandbox/coin_list.html', context)
+    return render(request, "sandbox/coin_list.html", context)
+
+
+def coin_select(request, name):
+    try:
+        coin = next(filter(lambda m: m.__name__.lower() == name.lower(), COIN_MODELS))
+    except Coin.DoesNotExist:
+        return Http404(f"Coin not found!")
+    
+    pull_func = lambda col: coin.objects.values_list(col, flat=True).order_by("-start_date")
+
+    context = dict(        
+        ticker    = coin.objects.last().ticker.upper(),
+        name      = coin.objects.last().name.capitalize(),
+        count     = coin.objects.count(),
+        coin_data = zip(
+            pull_func("start_date"),
+            pull_func("price_open"),
+            pull_func("price_high"),
+            pull_func("price_low"),
+            pull_func("price_close"),
+            pull_func("volume_traded"),
+            pull_func("trades_count")),
+        coin_icon = icon_path(coin.__ticker__),
+    )
+
+    return render(request, f"sandbox/coin_select.html", context)
 
 
 class SignUp(CreateView):

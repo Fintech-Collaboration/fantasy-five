@@ -1,28 +1,15 @@
 {% extends 'sandbox/base.html' %}
 {% load static %}
-    
+
 <DOCTYPE html>
 <html lang="en">
-    {% block head %}
-    <link rel="stylesheet" href="{% static 'sandbox/style.css' %}">
-    {% endblock %}
-
     {% block content %}
-        <body>  
-            <div class="coin-icon-div">
-                <img class="coin-icon-img" src="{% static coin_icon %}" alt={{ ticker }}>
-                <label class="coin-icon-label">{{ ticker }}</label><br>
-            </div>
-            <div class="coin-name-div">
-                <p class="coin-name-p">{{ coin_name }}</p>
-            </div>
-            {% autoescape off %}
-            {% block body %}
-                <div class="plot-div">{{ coin_plot }}</div>
-            {% endblock %}
-            {% endautoescape %}
-        </body>
-        <a href="{% url 'logout' %}">Log Out</a>
+    <body>
+        {% autoescape off %}
+        {% block body %}
+            <div class="plot-div">{{ coin_plot }}</div>
+        {% endblock %}
+        {% endautoescape %}
+    </body>
     {% endblock %}
 </html>
-
