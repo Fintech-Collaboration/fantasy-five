@@ -10,24 +10,13 @@ from django.contrib.auth.forms      import UserCreationForm
 from django.views.generic           import ListView
 from django.views.generic.edit      import CreateView, DeleteView, UpdateView
 
-from .config.coin import coin_references, icon_path, get_coin_data
+from .utils.coin import icon_path, get_coin_data
 
 from .models import (
     Owner,
     Portfolio,
     Coin,
-    Aave,
-    Aragon,
-    Augur,
-    Balancer,
-    Bitcoin,
-    Cardano,
-    Cosmos,
-    Ethereum,
-    EthereumClassic,
-    Orchid,
-    Tether,
-    Tezos,
+    COIN_MODELS,
 )
 
 from .forms  import (
@@ -37,22 +26,8 @@ from .forms  import (
     PortfolioUpdateForm,
 )
 
-TICKER = "BTC"
-
-MODELS = (
-    Aave,
-    Aragon,
-    Augur,
-    Balancer,
-    Bitcoin,
-    Cardano,
-    Cosmos,
-    Ethereum,
-    EthereumClassic,
-    Orchid,
-    Tether,
-    Tezos,
-)
+COIN      = "bitcoin"
+USE_MODEL = next(filter(lambda m: m.__name__.lower() == COIN, COIN_MODELS))
 
 def logout_view(request):
     logout(request)
@@ -60,13 +35,15 @@ def logout_view(request):
 
 
 def home(request):
-    coin_name = coin_references(TICKER)
-    coin_icon = icon_path(TICKER)
+    ticker = USE_MODEL.__ticker__
+    name   = USE_MODEL.__name__
+
+    coin_icon = icon_path(ticker)
     coin_plot = line_plot()
 
     context = {
-        "ticker":    TICKER.upper(),
-        "coin_name": coin_name,
+        "ticker":    ticker.upper(),
+        "coin_name": name,
         "coin_icon": coin_icon,
         "coin_plot": coin_plot,
     }
@@ -74,7 +51,10 @@ def home(request):
 
 
 def line_plot():
-    coin_df = get_coin_data(TICKER)
+    ticker = USE_MODEL.__ticker__
+    name   = USE_MODEL.__name__
+
+    coin_df = get_coin_data(name, ticker)
     x_data  = coin_df.index
     y_data  = coin_df["price_close"]
 
@@ -82,7 +62,7 @@ def line_plot():
         x=x_data,
         y=y_data,
         mode='lines',
-        name=TICKER.upper(),
+        name=ticker.upper(),
         opacity=0.8,
         marker_color='green',
     )],
@@ -92,15 +72,21 @@ def line_plot():
 
 
 def coin_data(request):
-    context = {}
+    coin_data = []
+    for coin in COIN_MODELS:
+        coin_data.append(dict(
+            ticker        = coin.objects.last().ticker.upper(),
+            name          = coin.objects.last().name.capitalize(),
+            price_open    = f"{coin.objects.last().price_open:.2f}",
+            price_high    = f"{coin.objects.last().price_high:.2f}",
+            price_low     = f"{coin.objects.last().price_low:.2f}",
+            price_close   = f"{coin.objects.last().price_close:.2f}",
+            volume_traded = f"{coin.objects.last().volume_traded:.2f}",
+            trades_count  = coin.objects.last().trades_count,
+        ))
 
-    for coin in MODELS:
-        key         = f"{coin.objects.all()[0].ticker}_close_price"
-        length_vals = coin.objects.count()-1
-        price_close = coin.objects.all()[length_vals].price_close
+        context = {"coin_data": coin_data}
         
-        context = {**context, **{key: price_close}}
-
     return render(request, 'sandbox/coin_list.html', context)
 
 

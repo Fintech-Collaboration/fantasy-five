@@ -3,33 +3,29 @@
 {% block content %}
 
 <h2>Coin List</h2>
-<div class="coin-data-div">
-  <p class="coin-data-p">{{ eth_close_price }}</p>
-</div>
 
 <table id="coins">
   <tr>
     <th>Ticker</th>
     <th>Name</th>
-    <th>Closing Price</th>
-    <th>24H High</th>
-    <th>24H Low</th>
+    <th>Opening Price (USD)</th>
+    <th>24H High (USD)</th>
+    <th>24H Low (USD)</th>
+    <th>Closing Price (USD)</th>
     <th>Volume</th>
-    <th>Market Cap</th>
-    <th>Supply</th>
+    <th>Trades</th>
       <th> </th>
   </tr> 
-  {% for coin in coin_list|dictsort:"marketcap" %}
+  {% for coin in coin_data|dictsort:"price_close" %}
   <tr>
     <td>{{ coin.ticker }}</td>
     <td>{{ coin.name }}</td>
-    <td>{{ coin.current_price }}</td>
-    <td>{{ coin.high24 }}</td>
-    <td>{{ coin.low24 }}</td>
-    <td>{{ coin.volume }}</td>
-    <td>{{ coin.market_cap }}</td>
-    <td>{{ coin.supply }}</td>
-    <td><a href="{% url 'portfolioupdate' coin.id %}">Add</a></td>
+    <td>${{ coin.price_open }}</td>
+    <td>${{ coin.price_high }}</td>
+    <td>${{ coin.price_low }}</td>
+    <td>${{ coin.price_close }}</td>
+    <td>{{ coin.volume_traded }}</td>
+    <td>{{ coin.trades_count }}</td>
   </tr>
   {% endfor %}
 </table>
