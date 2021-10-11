@@ -1,9 +1,5 @@
-import os
-from django.http.response import HttpResponse
-
-import pandas as pd
-
-from .config.coin import coin_references, icon_path
+from plotly.offline    import plot
+from plotly.graph_objs import Scatter
 
 from django.urls                    import reverse_lazy
 from django.shortcuts               import render, redirect
@@ -14,16 +10,49 @@ from django.contrib.auth.forms      import UserCreationForm
 from django.views.generic           import ListView
 from django.views.generic.edit      import CreateView, DeleteView, UpdateView
 
-from .models import Owner, Portfolio
+from .config.coin import coin_references, icon_path, get_coin_data
 
-from pathlib           import Path
-from plotly.offline    import plot
-from plotly.graph_objs import Scatter
+from .models import (
+    Owner,
+    Portfolio,
+    Coin,
+    Aave,
+    Aragon,
+    Augur,
+    Balancer,
+    Bitcoin,
+    Cardano,
+    Cosmos,
+    Ethereum,
+    EthereumClassic,
+    Orchid,
+    Tether,
+    Tezos,
+)
 
+from .forms  import (
+    OwnerCreateForm,
+    PortfolioCreateForm,
+    OwnerUpdateForm,
+    PortfolioUpdateForm,
+)
 
-DATA_PATH = "../data/archive"
-TEST_DATA = lambda t: os.path.join(DATA_PATH, f"{coin_references(t)}_5_year.csv")
+TICKER = "BTC"
 
+MODELS = (
+    Aave,
+    Aragon,
+    Augur,
+    Balancer,
+    Bitcoin,
+    Cardano,
+    Cosmos,
+    Ethereum,
+    EthereumClassic,
+    Orchid,
+    Tether,
+    Tezos,
+)
 
 def logout_view(request):
     logout(request)
@@ -31,13 +60,12 @@ def logout_view(request):
 
 
 def home(request):
-    ticker    = "BTC"
-    coin_name = coin_references(ticker)
-    coin_icon = icon_path(ticker)
-    coin_plot = line_plot(ticker)
+    coin_name = coin_references(TICKER)
+    coin_icon = icon_path(TICKER)
+    coin_plot = line_plot()
 
     context = {
-        "ticker":    ticker.upper(),
+        "ticker":    TICKER.upper(),
         "coin_name": coin_name,
         "coin_icon": coin_icon,
         "coin_plot": coin_plot,
@@ -45,28 +73,35 @@ def home(request):
     return render(request, "sandbox/home.html", context)
 
 
-def line_plot(ticker):
-    df = pd.read_csv(
-        Path(TEST_DATA(ticker)),
-        index_col=f"{ticker.lower()}_start_date",
-        parse_dates=True,
-        infer_datetime_format=True,
-    )
-
-    x_data = df.index
-    y_data = df["price_close"]
+def line_plot():
+    coin_df = get_coin_data(TICKER)
+    x_data  = coin_df.index
+    y_data  = coin_df["price_close"]
 
     plt = plot([Scatter(
         x=x_data,
         y=y_data,
         mode='lines',
-        name=ticker.upper(),
+        name=TICKER.upper(),
         opacity=0.8,
         marker_color='green',
     )],
     output_type='div')  
 
     return plt
+
+
+def coin_data(request):
+    context = {}
+
+    for coin in MODELS:
+        key         = f"{coin.objects.all()[0].ticker}_close_price"
+        length_vals = coin.objects.count()-1
+        price_close = coin.objects.all()[length_vals].price_close
+        
+        context = {**context, **{key: price_close}}
+
+    return render(request, 'sandbox/coin_list.html', context)
 
 
 class SignUp(CreateView):
@@ -79,33 +114,36 @@ class OwnerList(ListView):
     model = Owner
 
 
+class CoinList(ListView):
+    model = Coin
+
+
 class PortfolioList(ListView):
     model = Portfolio
 
 
-class OwnerCreate(LoginRequiredMixin, CreateView):
+class OwnerCreate(CreateView):
     model         = Owner
     template_name = "sandbox/owner_create_form.html"
-    fields        = ["username", "first_name", "last_name", "email"]
-    success_url   = reverse_lazy("ownerlist")
+    form_class    = OwnerCreateForm
+
 
 class PortfolioCreate(LoginRequiredMixin, CreateView):
     model         = Portfolio
     template_name = "sandbox/portfolio_create_form.html"
-    fields        = ["coin_list", "investment", "balance", "owner"]
-    success_url   = reverse_lazy("portfoliolist")
+    form_class    = PortfolioCreateForm
 
 
 class OwnerUpdate(LoginRequiredMixin, UpdateView):
     model         = Owner
     template_name = "sandbox/owner_update_form.html"
-fields        = ["username", "first_name", "last_name", "email"]
+    form_class    = OwnerUpdateForm
 
 
 class PortfolioUpdate(LoginRequiredMixin, UpdateView):
   model         = Portfolio
   template_name = "sandbox/portfolio_update_form.html"
-  fields        = ["coin_list", "investment", "balance", "owner"]
+  form_class    = PortfolioUpdateForm
 
 
 class OwnerDelete(LoginRequiredMixin, DeleteView):

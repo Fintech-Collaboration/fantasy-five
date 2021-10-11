@@ -1,3 +1,7 @@
-from django.test import TestCase
+import os
 
-# Create your tests here.
+from pathlib import Path
+
+coin = "bitcoin"
+base = Path(__file__).resolve().parent.parent
+
