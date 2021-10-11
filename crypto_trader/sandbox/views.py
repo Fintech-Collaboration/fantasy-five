@@ -5,12 +5,14 @@ from django.urls                    import reverse_lazy
 from django.shortcuts               import render, redirect
 from django.contrib.auth.mixins     import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth            import logout
+from django.contrib.auth            import authenticate
+from django.contrib.auth            import logout, login
 from django.contrib.auth.forms      import UserCreationForm
 from django.views.generic           import ListView
 from django.views.generic.edit      import CreateView, DeleteView, UpdateView
+from django.contrib                 import messages
 
-from django.http import Http404
+from django.http import Http404, HttpResponse
 
 from .utils.coin import icon_path, get_coin_data
 
@@ -22,6 +24,7 @@ from .models import (
 
 from .forms  import (
     OwnerCreateForm,
+    UserCreateForm,
     PortfolioCreateForm,
     OwnerUpdateForm,
     PortfolioUpdateForm,
@@ -31,9 +34,51 @@ COIN        = "bitcoin"
 COIN_MODELS = Coin.__subclasses__()
 USE_MODEL   = next(filter(lambda m: m.__name__.lower() == COIN, COIN_MODELS))
 
+
+def signup_view(request):
+    if request.user.is_authenticated:
+        messages.info(request, f"Logged out of {request.user}")
+        logout(request)
+        
+    form = UserCreateForm()
+    context = {"form": form}
+
+    if request.method == "POST":
+        form = UserCreateForm(request.POST)
+        if form.is_valid():
+            form.save()
+
+            user = form.cleaned_data.get("username")
+            messages.success(request, f"Account created for {user}!")
+
+            return redirect("login")
+
+    return render(request, "registration/signup.html", context)
+
+
+def login_view(request):
+    if request.user.is_authenticated:
+        return redirect("home")
+
+    if request.method == "POST":
+        username = request.POST["username"]
+        password = request.POST["password"]
+        user     = authenticate(request, username=username, password=password)
+
+        if user is not None:
+            login(request, user)
+            return redirect("home")
+        else:
+            messages.info(request, "Username OR password is incorrect")
+    
+    context = {}
+    return render(request, "registration/login.html", context)
+
+
+@login_required(login_url="login")
 def logout_view(request):
     logout(request)
-    return redirect("home")
+    return redirect("login")
 
 
 def home(request):
@@ -118,12 +163,6 @@ def coin_select(request, name):
     return render(request, f"sandbox/coin_select.html", context)
 
 
-class SignUp(CreateView):
-    form_class    = UserCreationForm
-    success_url   = reverse_lazy("login")
-    template_name = "registration/signup.html"
-
-
 class OwnerList(ListView):
     model = Owner
 
@@ -132,11 +171,11 @@ class CoinList(ListView):
     model = Coin
 
 
-class PortfolioList(ListView):
+class PortfolioList(LoginRequiredMixin, ListView):
     model = Portfolio
 
 
-class OwnerCreate(CreateView):
+class OwnerCreate(LoginRequiredMixin, CreateView):
     model         = Owner
     template_name = "sandbox/owner_create_form.html"
     form_class    = OwnerCreateForm

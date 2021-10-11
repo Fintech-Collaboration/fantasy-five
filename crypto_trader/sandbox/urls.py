@@ -1,13 +1,14 @@
 from django.urls         import path, include
 from .                   import views
-from django.contrib.auth import logout
+from django.contrib.auth import login, logout
 
 
 urlpatterns = [
   path("",                       views.home,                          name="home"),
-  path("signup/",                views.SignUp.as_view(),              name="signup"),
-  path("logout/",                logout,                              name="logout"),
-  path("account/",               include("django.contrib.auth.urls"), name="login"),
+  path("signup/",                views.signup_view,                   name="signup"),
+  path("login/",                 views.login_view,                    name="login"),
+  path("logout/",                views.logout_view,                   name="logout"),
+  path("login/",                 include("django.contrib.auth.urls"), name="login"),
   path("owner/list",             views.OwnerList.as_view(),           name="ownerlist"),
   path("portfolio/list",         views.PortfolioList.as_view(),       name="portfoliolist"),
   path("coin/list",              views.CoinList.as_view(),            name="coinlist"),

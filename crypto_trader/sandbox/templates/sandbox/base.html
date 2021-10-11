@@ -18,10 +18,14 @@
   <a href="{% url 'home' %}">Home | </a>
   <a href="{% url 'ownerlist' %}">Member Rankings | </a>
   <a href="{% url 'portfoliolist' %}">Portfolio Rankings | </a>
-  <a href="{% url 'ownercreate' %}">Register | </a>
+  <a href="{% url 'signup' %}">Register | </a>
   <a href="{% url 'portfoliocreate' %}">Create Portfolio |</a>
   <a href="{% url 'cointable' %}">Cryptocurrency Rankings</a>
-  <h1>Welcome to Crytpo Trading Sandbox!</h1>
+  {% if request.user.username %}
+    <h1>Welcome to Crytpo Trading Sandbox {{ request.user.username }}!</h1>
+  {% else %}
+    <h1>Welcome to Crytpo Trading Sandbox!</h1>
+  {% endif %}
 
   <div class="coin-icon-div">
       <img class="coin-icon-img" src="{% static coin_icon %}" alt={{ ticker }}>
@@ -34,5 +38,11 @@
   {% endblock %}
 </body>
 
-<footer><a href="{% url 'logout' %}">Logout</a></footer>
+<footer>
+    {% if request.user.username %}
+        <a href="{% url 'logout' %}">Logout</a>
+    {% else %}
+        <a href="{% url 'login' %}">Login</a>
+    {% endif %}
+</footer>
 
