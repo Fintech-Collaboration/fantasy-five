@@ -1,6 +1,5 @@
 from django.contrib import admin
 from sandbox.models import (
-    Owner,
     Portfolio,
     Aave,
     Aragon,
@@ -76,6 +75,5 @@ class TetherAdmin(admin.ModelAdmin):
 class TezosAdmin(admin.ModelAdmin):
     pass
 
-admin.site.register(Owner)
 admin.site.register(Portfolio)
 

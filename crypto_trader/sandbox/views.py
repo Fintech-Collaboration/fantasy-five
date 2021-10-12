@@ -1,3 +1,7 @@
+import plotly.graph_objects as go
+
+from ipywidgets import widgets, Dropdown, Layout
+
 from plotly.offline    import plot
 from plotly.graph_objs import Scatter
 
@@ -7,26 +11,21 @@ from django.contrib.auth.mixins     import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth            import authenticate
 from django.contrib.auth            import logout, login
-from django.contrib.auth.forms      import UserCreationForm
 from django.views.generic           import ListView
 from django.views.generic.edit      import CreateView, DeleteView, UpdateView
 from django.contrib                 import messages
-
-from django.http import Http404, HttpResponse
+from django.http                    import Http404, HttpResponse
 
 from .utils.coin import icon_path, get_coin_data
 
 from .models import (
-    Owner,
     Portfolio,
     Coin,
 )
 
 from .forms  import (
-    OwnerCreateForm,
     UserCreateForm,
     PortfolioCreateForm,
-    OwnerUpdateForm,
     PortfolioUpdateForm,
 )
 
@@ -113,7 +112,7 @@ def line_plot():
         opacity=0.8,
         marker_color='green',
     )],
-    output_type='div')  
+    output_type='div')
 
     return plt
 
@@ -163,10 +162,6 @@ def coin_select(request, name):
     return render(request, f"sandbox/coin_select.html", context)
 
 
-class OwnerList(ListView):
-    model = Owner
-
-
 class CoinList(ListView):
     model = Coin
 
@@ -175,34 +170,16 @@ class PortfolioList(LoginRequiredMixin, ListView):
     model = Portfolio
 
 
-class OwnerCreate(LoginRequiredMixin, CreateView):
-    model         = Owner
-    template_name = "sandbox/owner_create_form.html"
-    form_class    = OwnerCreateForm
-
-
 class PortfolioCreate(LoginRequiredMixin, CreateView):
     model         = Portfolio
     template_name = "sandbox/portfolio_create_form.html"
     form_class    = PortfolioCreateForm
 
 
-class OwnerUpdate(LoginRequiredMixin, UpdateView):
-    model         = Owner
-    template_name = "sandbox/owner_update_form.html"
-    form_class    = OwnerUpdateForm
-
-
 class PortfolioUpdate(LoginRequiredMixin, UpdateView):
   model         = Portfolio
   template_name = "sandbox/portfolio_update_form.html"
   form_class    = PortfolioUpdateForm
-
-
-class OwnerDelete(LoginRequiredMixin, DeleteView):
-    model         = Owner
-    template_name = "sandbox/owner_delete_form.html"
-    success_url   = reverse_lazy("ownerlist")
 
 
 class PortfolioDelete(LoginRequiredMixin, DeleteView):

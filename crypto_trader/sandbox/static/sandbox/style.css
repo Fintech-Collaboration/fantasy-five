@@ -1,5 +1,12 @@
+.page-title {
+    text-align: center;
+    color: black;
+}
+
 body {
     width: 100%;
+    margin: 20px;
+    padding: 20px;
 }
 
 .plot-div {

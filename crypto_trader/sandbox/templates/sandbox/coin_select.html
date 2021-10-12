@@ -3,31 +3,76 @@
 
 <DOCTYPE html>
 <html lang="en">
-  <body>
   {% block content %}
-    <br><br>
-    <center><table id="coins">
-      <tr>
-        <th>Date</th>
-        <th>Open (USD)</th>
-        <th>24HR High (USD)</th>
-        <th>24HR Low</th>
-        <th>Close (USD)</th>
-        <th>Volume</th>
-        <th>Trades</th>
-      </tr> 
-      {% for start_date, price_open, price_high, price_low, price_close, volume_traded, trades_count in coin_data %}
-      <tr>
-        <td>{{ start_date|date:"Y-M-d" }}</td>
-        <td>{{ price_open|floatformat:"2" }}</td>
-        <td>{{ price_high|floatformat:"2" }}</td>
-        <td>{{ price_low|floatformat:"2" }}</td>
-        <td>{{ price_close|floatformat:"2" }}</td>
-        <td>{{ volume_traded|floatformat:"0" }}</td>
-        <td>{{ trades_count|floatformat:"0" }}</td>
-      </tr>
-      {% endfor %}
-    </table></center>
+  <head>
+    <title>Coin Table</title>
+    <style>
+      body,
+      html {
+        margin: 10px;
+        padding: 0;
+        background: white !important;
+        text-align: center;
+        align-content: center;
+        font-family: system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol;
+      }
+      a {
+        color: navy;
+      }
+      .portfolio_card {
+        display: flex;
+        flex-direction: column;
+        -webkit-box-align: center;
+        align-items: center;
+        width: 750px;
+        margin: 0px auto;
+        background: powderblue;
+        box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+        -webkit-box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+        -moz-box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+        border-radius: 5px;
+      }
+    </style>
+  </head>
+
+  <body>    
+    <div class="container h-50">
+      <div class="d-flex justify-content-center h-100">
+        <div class="portfolio_card">
+          
+          <div class="coin-icon-div">
+            <img class="coin-icon-img" src="{% static coin_icon %}" alt={{ ticker }}>
+            <label class="coin-icon-label">{{ ticker }}</label><br>
+          </div>
+          <div class="coin-name-div">
+              <p class="coin-name-p">{{ coin_name }}</p>
+          </div>
+
+          <center><table id="coins">
+            <tr>
+              <th>Date</th>
+              <th>Open (USD)</th>
+              <th>24HR High (USD)</th>
+              <th>24HR Low</th>
+              <th>Close (USD)</th>
+              <th>Volume</th>
+              <th>Trades</th>
+            </tr> 
+            {% for start_date, price_open, price_high, price_low, price_close, volume_traded, trades_count in coin_data %}
+            <tr>
+              <td>{{ start_date|date:"Y-M-d" }}</td>
+              <td>{{ price_open|floatformat:"2" }}</td>
+              <td>{{ price_high|floatformat:"2" }}</td>
+              <td>{{ price_low|floatformat:"2" }}</td>
+              <td>{{ price_close|floatformat:"2" }}</td>
+              <td>{{ volume_traded|floatformat:"0" }}</td>
+              <td>{{ trades_count|floatformat:"0" }}</td>
+            </tr>
+            {% endfor %}
+          </table></center>
+        </div>
+      </div>
+    </div>
   </body>
   {% endblock %}
 </html>

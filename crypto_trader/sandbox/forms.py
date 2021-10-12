@@ -3,13 +3,7 @@ from django.contrib.auth.forms  import UserCreationForm
 from django.contrib.auth.models import User
 from django.contrib.auth.mixins import LoginRequiredMixin
 
-from .models import Owner, Portfolio
-
-
-class OwnerCreateForm(forms.ModelForm):
-    class Meta:
-        model  = Owner
-        fields = ("__all__")
+from .models import Portfolio
 
 
 class UserCreateForm(UserCreationForm):
@@ -27,21 +21,15 @@ class UserCreateForm(UserCreationForm):
 
 class PortfolioCreateForm(LoginRequiredMixin, forms.ModelForm):
     class Meta:
-        model  = Portfolio
-        fields = ("__all__")
-
-
-class OwnerUpdateForm(forms.ModelForm):
-    class Meta:
-        model  = Owner
-        fields = ("__all__")
+        model   = Portfolio
+        fields  = ("__all__")
 
 
 class PortfolioUpdateForm(forms.ModelForm):
     class Meta:
         model  = Portfolio
         fields = (
-            "coin_list",
+            "nickname",
             "investment",
         )
 
