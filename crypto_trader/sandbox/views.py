@@ -136,7 +136,7 @@ def coin_table(request):
     return render(request, "sandbox/coin_list.html", context)
 
 
-def coin_select(request, name):
+def coin_page(request, name):
     try:
         coin = next(filter(lambda m: m.__name__.lower() == name.lower(), COIN_MODELS))
     except Coin.DoesNotExist:
@@ -159,7 +159,7 @@ def coin_select(request, name):
         coin_icon = icon_path(coin.__ticker__),
     )
 
-    return render(request, f"sandbox/coin_select.html", context)
+    return render(request, f"sandbox/coin_page.html", context)
 
 
 class CoinList(ListView):

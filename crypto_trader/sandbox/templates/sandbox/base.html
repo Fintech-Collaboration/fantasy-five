@@ -41,9 +41,9 @@
   <div class="container">
     <span class="navigation-bar">
       <a href="{% url 'home' %}">Home | </a>
-      <a href="{% url 'portfoliolist' %}">Portfolios | </a>
-      <a href="{% url 'portfoliocreate' %}">Create Portfolio |</a>
-      <a href="{% url 'cointable' %}">Cryptocurrency Rankings</a>
+      <a href="{% url 'about' %}">About | </a>
+      <a href="{% url 'portfoliolist' %}">Portfolio | </a>
+      <a href="{% url 'cointable' %}">Crypto List</a>
     </span>
     {% if request.user.is_authenticated %}
       <span class="user-access">
