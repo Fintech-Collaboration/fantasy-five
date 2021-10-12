@@ -22,7 +22,7 @@ class UserCreateForm(UserCreationForm):
 class PortfolioCreateForm(LoginRequiredMixin, forms.ModelForm):
     class Meta:
         model  = Portfolio
-        fields = ("__all__")
+        fields = ("nickname", "investment")
 
 
 class PortfolioUpdateForm(forms.ModelForm):
