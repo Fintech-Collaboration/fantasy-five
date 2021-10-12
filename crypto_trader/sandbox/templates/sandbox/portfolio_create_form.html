@@ -14,12 +14,12 @@
 			margin: 10px;
 			padding: 0;
 			background: white !important;
-      text-align: center;
-      font-family: system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol;
+      		text-align: center;
+      		font-family: system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol;
 		}
-    a {
-      color: navy;
-    }
+		a {
+			color: navy;
+		}
 		.portfolio_card {
 			width: 350px;
 			margin-top: auto;
@@ -36,11 +36,9 @@
 			border-radius: 5px;
 
 		}
-
 		.form_container {
 			margin-top: 20px;
 		}
-
 		#form-title{
 			color: #fff;
 		}
@@ -61,22 +59,21 @@
 			color: white !important;
 			border: 0 !important;
 			border-radius: 0.25rem 0 0 0.25rem !important;
+			width: 30px;
+			margin-right: 2px;
 		}
 		.input_user,
 		.input_pass:focus {
 			box-shadow: none !important;
 			outline: 0px !important;
 		}
-
-    #messages{
-        background-color: grey;
-        color: #fff;
-        padding: 10px;
-        margin-top: 10px;
-    }
-
+		#messages{
+			background-color: grey;
+			color: #fff;
+			padding: 10px;
+			margin-top: 10px;
+		}
 	</style>
-
 </head>
 
 <body>
@@ -116,7 +113,6 @@
         {% for message in messages %}
             <p id="messages">{{ message }}</p>
         {% endfor %}
-
       </div>
     </div>
   </div>

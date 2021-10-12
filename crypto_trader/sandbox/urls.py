@@ -15,6 +15,7 @@ urlpatterns = [
   path("portfolio/delete/<pk>/", views.PortfolioDelete.as_view(),     name="portfoliodelete"),
   path("coin/list",              views.CoinList.as_view(),            name="coinlist"),
   path("coin/table",             views.coin_table,                    name="cointable"),
-  path("coin/<slug:name>/",      views.coin_page,                     name="coinpage")
+  path("coin/<slug:name>/",      views.coin_page,                     name="coinpage"),
+  path("coin/buy/<slug:name>/",  views.coin_buy,                      name="coinbuy"),
 ]
 

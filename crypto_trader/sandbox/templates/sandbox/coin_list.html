@@ -86,17 +86,17 @@
 				<th>Trades</th>
 			</tr> 
 			{% for coin in coin_data|dictsort:"name" %}
-			<tr>
-				<td><a href="{% url 'portfoliocreate' %}"><button>Buy</button></a></td>
-				<td><a href="{% url 'coinpage' coin.name|cut:" " %}">{{ coin.ticker }}</a></td>
-				<td>{{ coin.name }}</td>
-				<td>${{ coin.price_open }}</td>
-				<td>${{ coin.price_high }}</td>
-				<td>${{ coin.price_low }}</td>
-				<td>${{ coin.price_close }}</td>
-				<td>{{ coin.volume_traded }}</td>
-				<td>{{ coin.trades_count }}</td>
-			</tr>
+				<tr>
+					<td><a href="{% url 'coinbuy' coin.name|cut:' ' %}"><button>Buy</button></a></td>
+					<td><a href="{% url 'coinpage' coin.name|cut:' ' %}">{{ coin.ticker }}</a></td>
+					<td>{{ coin.name }}</td>
+					<td>${{ coin.price_open }}</td>
+					<td>${{ coin.price_high }}</td>
+					<td>${{ coin.price_low }}</td>
+					<td>${{ coin.price_close }}</td>
+					<td>{{ coin.volume_traded }}</td>
+					<td>{{ coin.trades_count }}</td>
+				</tr>
 			{% endfor %}
 			</table>
 		</div>

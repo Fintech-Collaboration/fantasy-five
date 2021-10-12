@@ -1,0 +1,79 @@
+{% extends './coinbase.html' %}
+{% load static %}
+
+<DOCTYPE html>
+<html lang="en">
+  {% block content %}
+	<head>
+	<title>Coin List</title>
+
+    	<style>
+			body,
+			html {
+				margin: 10px;
+				padding: 0;
+				background: white !important;
+				text-align: center;
+				align-content: center;
+				font-family: system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol;
+			}
+			a {
+				color: navy;
+			}
+			.portfolio_card {
+				display: flex;
+				flex-direction: column;
+				-webkit-box-align: center;
+				align-items: center;
+				width: 900px;
+				margin: 0px auto;
+				background: powderblue;
+				box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+				-webkit-box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+				-moz-box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+				border-radius: 5px;
+			}
+		</style>
+	</head>
+
+	<body>
+		<div class="container h-50">
+			<div class="d-flex justify-content-center h-100">
+			<div class="portfolio_card">
+          
+				<div class="coin-icon-div">
+				  <img class="coin-icon-img" src="{% static coin_icon %}" alt={{ ticker }}>
+				  <label class="coin-icon-label">{{ ticker }}</label><br>
+				</div>
+				<div class="coin-name-div">
+					<p class="coin-name-p">{{ coin_name }}</p>
+				</div>
+				<div>
+					<a href="{% url 'coinpage' name|cut:' ' %}"><button>Analysis</button></a>
+				</div>
+				
+				<table id="coins">
+				<tr>
+					<th>Date</th>
+					<th>Opening Price (USD)</th>
+					<th>24H High (USD)</th>
+					<th>24H Low (USD)</th>
+					<th>Closing Price (USD)</th>
+					<th>Volume</th>
+					<th>Trades</th>
+				</tr> 
+				<tr>
+					<td>{{ start_date }}</td>
+					<td>{{ price_open }}</td>
+					<td>{{ price_high }}</td>
+					<td>{{ price_low }}</td>
+					<td>{{ price_close }}</td>
+					<td>{{ volume_traded }}</td>
+					<td>{{ trades_count }}</td>
+				</tr>
+				</table>
+			</div>
+		</div>
+	</body>
+	{% endblock %}
+</html>

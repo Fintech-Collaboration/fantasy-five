@@ -1,9 +1,6 @@
-import plotly.graph_objects as go
-
-from ipywidgets import widgets, Dropdown, Layout
-
 from plotly.offline    import plot
 from plotly.graph_objs import Scatter
+from datetime          import datetime
 
 from django.urls                    import reverse_lazy
 from django.shortcuts               import render, redirect
@@ -160,6 +157,30 @@ def coin_page(request, name):
     )
 
     return render(request, f"sandbox/coin_page.html", context)
+
+
+def coin_buy(request, name):
+    try:
+        coin = next(filter(lambda m: m.__name__.lower() == name.lower(), COIN_MODELS))
+    except Coin.DoesNotExist:
+        return Http404(f"Coin not found!")
+
+    print(coin.objects.last().start_date)
+    
+    context = dict(        
+        ticker        = coin.objects.last().ticker.upper(),
+        name          = coin.objects.last().name.capitalize(),
+        start_date    = coin.objects.last().start_date.strftime("%Y-%b-%d"),
+        price_open    = f"{coin.objects.last().price_open:,.2f}",
+        price_high    = f"{coin.objects.last().price_high:,.2f}",
+        price_low     = f"{coin.objects.last().price_low:,.2f}",
+        price_close   = f"{coin.objects.last().price_close:,.2f}",
+        volume_traded = f"{coin.objects.last().volume_traded:,.0f}",
+        trades_count  = f"{coin.objects.last().trades_count:,.0f}",
+        coin_icon = icon_path(coin.__ticker__),
+    )
+
+    return render(request, f"sandbox/coin_buy.html", context)
 
 
 class CoinList(ListView):
