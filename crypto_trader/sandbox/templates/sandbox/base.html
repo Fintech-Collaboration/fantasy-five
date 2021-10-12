@@ -27,23 +27,35 @@
       }
       .user-access {
         align-self: flex-end;
-        color: white;
-        padding: 4px;
+        color: whitesmoke;
+        padding-left: 4px;
+        padding-right: 4px;
+        padding-top: 2px;
+        padding-bottom: 4px;
         font-weight: bold;
-        font-size: 20px;
-        background-color: darkmagenta;
+        font-size: 16px;
+        background-color: lightseagreen;
       }
     </style>
-</head>
+
   {% block head %}
   <link rel="stylesheet" href="{% static 'sandbox/style.css' %}">
   {% endblock %}
+</head>
+
+<body>
   <div class="container">
     <span class="navigation-bar">
       <a href="{% url 'home' %}">Home | </a>
       <a href="{% url 'about' %}">About | </a>
       <a href="{% url 'portfoliolist' %}">Portfolio | </a>
-      <a href="{% url 'cointable' %}">Crypto List</a>
+      <a href="{% url 'cointable' %}">Crypto List | </a>
+      {% if request.user.is_authenticated %}
+          <a href="{% url 'logout' %}">Logout</a>
+      {% else %}
+        <a href="{% url 'signup' %}">Signup | </a>
+        <a href="{% url 'login' %}">Login</a>
+      {% endif %}
     </span>
     {% if request.user.is_authenticated %}
       <span class="user-access">
@@ -51,9 +63,7 @@
       </span>
     {% endif %}
   </div>
-</head>
 
-<body>
   <h1 class="page-title">Welcome to Fantasy-Five Sandbox!</h1>
 
   <div class="coin-icon-div">
@@ -63,16 +73,8 @@
   <div class="coin-name-div">
       <p class="coin-name-p">{{ coin_name }}</p>
   </div>
+  
   {% block content %}
   {% endblock %}
 </body>
-
-<footer>
-    {% if request.user.is_authenticated %}
-        <a href="{% url 'logout' %}">Logout</a>
-    {% else %}
-      <a href="{% url 'signup' %}">Signup | </a>
-      <a href="{% url 'login' %}">Login</a>
-    {% endif %}
-</footer>
 

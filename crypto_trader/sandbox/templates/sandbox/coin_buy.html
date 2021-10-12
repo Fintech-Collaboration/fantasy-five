@@ -5,33 +5,41 @@
 <html lang="en">
   {% block content %}
 	<head>
-	<title>Coin List</title>
+		<title>Coin List</title>
 
     	<style>
-			body,
-			html {
-				margin: 10px;
-				padding: 0;
-				background: white !important;
-				text-align: center;
-				align-content: center;
-				font-family: system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol;
-			}
-			a {
-				color: navy;
-			}
-			.portfolio_card {
+			.portfolio_card,
+			.portfolio_card_sub {
 				display: flex;
 				flex-direction: column;
 				-webkit-box-align: center;
 				align-items: center;
 				width: 900px;
-				margin: 0px auto;
+				margin: 20px auto;
 				background: powderblue;
 				box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 				-webkit-box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 				-moz-box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 				border-radius: 5px;
+			}
+			.portfolio_card_sub {
+				width: 400px;
+				padding-bottom: 20px;
+				background: lightpink;
+			}
+			.coin_buy_form {
+				margin-top: 4px;
+				padding-top: 0px;
+				overflow: hidden;
+				object-fit: contain;
+			}
+			.coin_buy_label {
+				margin: 2px;
+				float: left;
+			}
+			.coin_buy {
+				margin: 2px;
+				float: right;
 			}
 		</style>
 	</head>
@@ -72,6 +80,20 @@
 					<td>{{ trades_count }}</td>
 				</tr>
 				</table>
+		
+			<div class="portfolio_card_sub">
+				<form class="coin_buy_form">
+					<h3>Purchase {{ name }}</h3>
+					<label class="coin_buy_label" for="portfolio">Portfolio&nbsp;&nbsp;&nbsp;&nbsp;</label>
+					<select class="coin_buy" id="portfolio" name="coin-buy" style="height: 24px; width: 158px;">
+						{% for p in portfolio %}
+							<option value="{{ p.nickname }}">{{ p.nickname }}</option>
+						{% endfor %}
+					</select><br>
+					<label class="coin_buy_label" for="amount">Amount (USD)&nbsp;&nbsp;&nbsp;&nbsp;</label>
+					<input class="coin_buy" type="number" id="amount" name="coin-buy" step="any" style="height: 18px; width: 150px;" /><br><br>
+					<input class="btn submit_btn" type="submit" value="Submit" />
+				</form>
 			</div>
 		</div>
 	</body>

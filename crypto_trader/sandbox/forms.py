@@ -21,8 +21,8 @@ class UserCreateForm(UserCreationForm):
 
 class PortfolioCreateForm(LoginRequiredMixin, forms.ModelForm):
     class Meta:
-        model   = Portfolio
-        fields  = ("__all__")
+        model  = Portfolio
+        fields = ("__all__")
 
 
 class PortfolioUpdateForm(forms.ModelForm):

@@ -165,8 +165,8 @@ def coin_buy(request, name):
     except Coin.DoesNotExist:
         return Http404(f"Coin not found!")
 
-    print(coin.objects.last().start_date)
-    
+    username = request.user.username
+
     context = dict(        
         ticker        = coin.objects.last().ticker.upper(),
         name          = coin.objects.last().name.capitalize(),
@@ -177,7 +177,8 @@ def coin_buy(request, name):
         price_close   = f"{coin.objects.last().price_close:,.2f}",
         volume_traded = f"{coin.objects.last().volume_traded:,.0f}",
         trades_count  = f"{coin.objects.last().trades_count:,.0f}",
-        coin_icon = icon_path(coin.__ticker__),
+        portfolio     = [p for p in Portfolio.objects.all() if p.owner.username == username],
+        coin_icon     = icon_path(coin.__ticker__),
     )
 
     return render(request, f"sandbox/coin_buy.html", context)

@@ -115,7 +115,7 @@ class Portfolio(models.Model):
 
     nickname   = CharField(max_length=20)
     coin_list  = MultiSelectField(choices=choices)
-    investment = models.FloatField(default=10000)
+    investment = models.FloatField()
     owner      = UserForeignKey(auto_user_add=True)
 
     def __str__(self):
