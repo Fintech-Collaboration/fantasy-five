@@ -1,6 +1,5 @@
 from plotly.offline    import plot
 from plotly.graph_objs import Scatter
-from datetime          import datetime
 
 from django.urls                    import reverse_lazy
 from django.shortcuts               import render, redirect
@@ -11,18 +10,22 @@ from django.contrib.auth            import logout, login
 from django.views.generic           import ListView
 from django.views.generic.edit      import CreateView, DeleteView, UpdateView
 from django.contrib                 import messages
-from django.http                    import Http404, HttpResponse
+from django.http                    import Http404
+from django.template.defaultfilters import slugify
+from django.db.models               import Q
 
 from .utils.coin import icon_path, get_coin_data
 
 from .models import (
     Portfolio,
     Coin,
+    Transaction,
 )
 
 from .forms  import (
     UserCreateForm,
     PortfolioCreateForm,
+    TransactionCreateForm,
     PortfolioUpdateForm,
 )
 
@@ -153,10 +156,43 @@ def coin_page(request, name):
             pull_func("price_close"),
             pull_func("volume_traded"),
             pull_func("trades_count")),
-        coin_icon = icon_path(coin.__ticker__),
+            coin_icon = icon_path(coin.__ticker__),
     )
 
     return render(request, f"sandbox/coin_page.html", context)
+
+
+# portfolio_select coin_id coin_count
+def transaction_create_view(request, coin_name):
+    form = TransactionCreateForm(request.POST or None)
+    if form.is_valid():
+        form.save()
+
+    # Get the latest instance of the current coin
+    coin_data_all    = Coin.objects.filter( Q(Coin___name = coin_name))
+    coin_data_length = len(coin_data_all)-1
+    coin_data_now    = coin_data_all[coin_data_length]
+
+    # Get only this user's portfolios
+    user_portfolios = [p for p in form.fields["portfolio"]._queryset if p.owner.username == request.user.username]
+    print(user_portfolios)
+
+    context = dict(
+        form          = form,
+        portfolio     = user_portfolios,
+        coin_name     = coin_name,
+        start_date    = coin_data_now.start_date,
+        price_open    = coin_data_now.price_open,
+        price_high    = coin_data_now.price_high,
+        price_low     = coin_data_now.price_low,
+        price_close   = coin_data_now.price_close,
+        volume_traded = coin_data_now.volume_traded,
+        trades_count  = coin_data_now.trades_count,
+        ticker        = coin_data_now.ticker.upper(),
+        coin_icon     = icon_path(coin_data_now.ticker.upper()),
+    )
+
+    return render(request, f"sandbox/transaction_create.html", context)
 
 
 def coin_buy(request, name):
@@ -164,12 +200,23 @@ def coin_buy(request, name):
         coin = next(filter(lambda m: m.__name__.lower() == name.lower(), COIN_MODELS))
     except Coin.DoesNotExist:
         return Http404(f"Coin not found!")
-
+    
     username = request.user.username
+
+    if request.method == "POST":
+        selected  = request.POST["coin-buy-select"]
+        count     = request.POST["coin-buy-count"]
+        portfolio = [p for p in Portfolio.objects.all() if p.nickname == selected][0]
+
+
+        portfolio.coin_list = f"{portfolio.coin_list}, {coin.__coinid__}" if portfolio.coin_list else f"{coin.__coinid__}"
+    else:
+        portfolio = None    
 
     context = dict(        
         ticker        = coin.objects.last().ticker.upper(),
         name          = coin.objects.last().name.capitalize(),
+        coin_id       = coin.__coinid__,
         start_date    = coin.objects.last().start_date.strftime("%Y-%b-%d"),
         price_open    = f"{coin.objects.last().price_open:,.2f}",
         price_high    = f"{coin.objects.last().price_high:,.2f}",
@@ -177,7 +224,7 @@ def coin_buy(request, name):
         price_close   = f"{coin.objects.last().price_close:,.2f}",
         volume_traded = f"{coin.objects.last().volume_traded:,.0f}",
         trades_count  = f"{coin.objects.last().trades_count:,.0f}",
-        portfolio     = [p for p in Portfolio.objects.all() if p.owner.username == username],
+        portfolio     = portfolio,
         coin_icon     = icon_path(coin.__ticker__),
     )
 
@@ -198,6 +245,12 @@ class PortfolioCreate(LoginRequiredMixin, CreateView):
     form_class    = PortfolioCreateForm
 
 
+# class TransactionCreate(LoginRequiredMixin, CreateView):
+#     model         = Transaction
+#     template_name = "sandbox/transaction_create.html"
+#     form_class    = TransactionCreateForm
+
+
 class PortfolioUpdate(LoginRequiredMixin, UpdateView):
   model         = Portfolio
   template_name = "sandbox/portfolio_update_form.html"
@@ -208,4 +261,4 @@ class PortfolioDelete(LoginRequiredMixin, DeleteView):
     model         = Portfolio
     template_name = "sandbox/portfolio_delete_form.html"
     success_url   = reverse_lazy("portfoliolist")
-  
+

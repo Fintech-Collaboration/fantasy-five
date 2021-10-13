@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'sandbox.apps.SandboxConfig',
     'django_userforeignkey',
     'multiselectfield',
+    'polymorphic',
 ]
 
 MIDDLEWARE = [

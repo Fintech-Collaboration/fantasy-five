@@ -1,138 +1,144 @@
-from os import name, stat
+from datetime import datetime
 
-from django.db.models.fields import BLANK_CHOICE_DASH, CharField
-from .utils.coin import get_coin_data
-
-from django.db                  import models
-from django.db.models.deletion  import CASCADE
-
-from multiselectfield import MultiSelectField
+from django.db                           import models
+from django.db.models.fields             import CharField
 from django_userforeignkey.models.fields import UserForeignKey
 
+from polymorphic.models import PolymorphicModel
 
-class Coin(models.Model):
-    start_date    = models.DateTimeField()
-    price_open    = models.FloatField()
-    price_high    = models.FloatField()
-    price_low     = models.FloatField()
-    price_close   = models.FloatField()
-    volume_traded = models.FloatField()
-    trades_count  = models.IntegerField()
+
+class Coin(PolymorphicModel):
+    start_date    = models.DateTimeField(default=datetime(1970, 1, 1, 0, 0, 0))
+    price_open    = models.FloatField(default=0.0)
+    price_high    = models.FloatField(default=0.0)
+    price_low     = models.FloatField(default=0.0)
+    price_close   = models.FloatField(default=0.0)
+    volume_traded = models.FloatField(default=0.0)
+    trades_count  = models.IntegerField(default=0)
     ticker        = models.CharField(max_length=8)
     name          = models.CharField(max_length=30)
+    count         = models.FloatField(default=0.0)
 
-    class Meta:
-        abstract = True
+    def __str__(self):
+        return self.name
+
+
+class Portfolio(models.Model):
+    nickname = CharField(max_length=20, unique=True)
+    balance  = models.FloatField(default=0.0)
+    owner    = UserForeignKey(auto_user_add=True)
+    coins    = models.ManyToManyField(Coin, through="Transaction")
+
+    def __str__(self):
+        return self.nickname
+    
+    def get_absolute_url(self):
+        return '/portfolio/list'
+
+
+class Transaction(models.Model):
+    time_executed = models.DateTimeField()
+    coin_count    = models.FloatField(default=0.0)
+    coin_cost     = models.FloatField(default=0.0)
+    coin          = models.ForeignKey(Coin, on_delete=models.CASCADE)
+    portfolio     = models.ForeignKey(Portfolio, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"{self.coin.name} --> {self.portfolio.nickname}"
 
 
 class Aave(Coin):
     __ticker__ = "AAVE"
+    __coinid__ = 1
     
     def __str__(self):
-        return self.start_date
+        return self.__ticker__
 
 
 class Aragon(Coin):
     __ticker__ = "ANT"
-    
+    __coinid__ = 2
     
     def __str__(self):
-        return self.start_date
+        return self.__ticker__
 
 
 class Augur(Coin):
     __ticker__ = "REP"
-    
+    __coinid__ = 3
+
     def __str__(self):
-        return self.start_date
+        return self.__ticker__
 
 
 class Balancer(Coin):
     __ticker__ = "BAL"
-    
+    __coinid__ = 4
+
     def __str__(self):
-        return self.start_date
+        return self.__ticker__
 
 
 class Bitcoin(Coin):
     __ticker__ = "BTC"
+    __coinid__ = 5
 
     def __str__(self):
-        return self.start_date
+        return self.__ticker__
 
 
 class Cardano(Coin):
     __ticker__ = "ADA"
-    
+    __coinid__ = 6
+
     def __str__(self):
-        return self.start_date
+        return self.__ticker__
 
 
 class Cosmos(Coin):
     __ticker__ = "ATOM"
-    
+    __coinid__ = 7
+
     def __str__(self):
-        return self.start_date
+        return self.__ticker__
 
 
 class Ethereum(Coin):
     __ticker__ = "ETH"
-    
+    __coinid__ = 8
+
     def __str__(self):
-        return self.start_date
+        return self.__ticker__
 
 
 class EthereumClassic(Coin):
     __ticker__ = "ETC"
-    
+    __coinid__ = 9
+
     def __str__(self):
-        return self.start_date
+        return self.__ticker__
 
 
 class Orchid(Coin):
     __ticker__ = "OXT"
-    
+    __coinid__ = 10
+
     def __str__(self):
-        return self.start_date
+        return self.__ticker__
 
 
 class Tether(Coin):
     __ticker__ = "USDT"
-    
+    __coinid__ = 11
+
     def __str__(self):
-        return self.start_date
+        return self.__ticker__
 
 
 class Tezos(Coin):
     __ticker__ = "XTZ"
-    
-    def __str__(self):
-        return self.start_date
-
-
-class Portfolio(models.Model):
-    choices = [(cm.__ticker__.upper(), cm.__name__) for cm in Coin.__subclasses__()]
-
-    nickname   = CharField(max_length=20)
-    coin_list  = MultiSelectField(choices=choices)
-    investment = models.FloatField()
-    owner      = UserForeignKey(auto_user_add=True)
+    __coinid__ = 12
 
     def __str__(self):
-        return f"{self.owner.first_name} {self.owner.last_name} ({self.coin_list})"
+        return self.__ticker__
 
-    # @property
-    # def balance(self):
-    #     if not isinstance(self.coin_list, list):
-    #         coin_list = [self.coin_list,]
-
-    #     coin_list = coin_list
-        
-    #     for coin in coin_list:
-    #         coin_df       = get_coin_data(coin)
-    #         current_price = coin_df["price_close"][-1] if coin_df else 0.0
-
-    #     return current_price
-    
-    def get_absolute_url(self):
-        return '/portfolio/list'

@@ -5,11 +5,11 @@
 <html lang="en">
   {% block content %}
 	<head>
-		<title>Coin List</title>
+		<title>Transaction</title>
 
     	<style>
-			.portfolio_card,
-			.portfolio_card_sub {
+			.transaction_card,
+			.transaction_card_sub {
 				display: flex;
 				flex-direction: column;
 				-webkit-box-align: center;
@@ -22,7 +22,7 @@
 				-moz-box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 				border-radius: 5px;
 			}
-			.portfolio_card_sub {
+			.transaction_card_sub {
 				width: 400px;
 				padding-bottom: 20px;
 				background: lightpink;
@@ -33,11 +33,13 @@
 				overflow: hidden;
 				object-fit: contain;
 			}
+			.portfolio_buy_label,
 			.coin_buy_label {
 				margin: 2px;
 				float: left;
 			}
-			.coin_buy {
+			.portfolio_buy_select,
+			.coin_buy_input {
 				margin: 2px;
 				float: right;
 			}
@@ -47,7 +49,7 @@
 	<body>
 		<div class="container h-50">
 			<div class="d-flex justify-content-center h-100">
-			<div class="portfolio_card">
+			<div class="transaction_card">
           
 				<div class="coin-icon-div">
 				  <img class="coin-icon-img" src="{% static coin_icon %}" alt={{ ticker }}>
@@ -57,7 +59,7 @@
 					<p class="coin-name-p">{{ coin_name }}</p>
 				</div>
 				<div>
-					<a href="{% url 'coinpage' name|cut:' ' %}"><button>Analysis</button></a>
+					<a href="{% url 'coinpage' coin_name|cut:' ' %}"><button>Analysis</button></a>
 				</div>
 				
 				<table id="coins">
@@ -81,22 +83,26 @@
 				</tr>
 				</table>
 		
-			<div class="portfolio_card_sub">
+			<div class="transaction_card_sub">
 				<form class="coin_buy_form" name="coin-buy-form" method="POST" >
 					{% csrf_token %}
 					<h3>Purchase {{ name }}</h3>
-					<label class="coin_buy_label" for="portfolio">Portfolio&nbsp;&nbsp;&nbsp;&nbsp;</label>
-					<select class="coin_buy" id="portfolio" name="coin-buy-select" style="height: 24px; width: 158px;">
+					<label class="portfolio_buy_label" for="portfolio-buy-select">Portfolio&nbsp;&nbsp;&nbsp;&nbsp;</label>
+					<select class="portfolio_buy_select" id="portfolio-buy-select" name="portfolio-buy-select" style="height: 24px; width: 158px;">
 						{% for p in portfolio %}
 							<option value="{{ p.nickname }}">{{ p.nickname }}</option>
 						{% endfor %}
 					</select><br>
-					<label class="coin_buy_label" for="count">Amount (USD)&nbsp;&nbsp;&nbsp;&nbsp;</label>
-					<input class="coin_buy" type="number" id="count" name="coin-buy-count" step="any" style="height: 18px; width: 150px;" /><br><br>
+					<label class="coin_buy_label" for="coin-buy-input">Coins&nbsp;&nbsp;&nbsp;&nbsp;</label>
+					<input class="coin_buy_input" type="number" id="coin-buy-input" name="coin-buy-input" step="any" style="height: 18px; width: 150px;" /><br><br>
 					<input class="btn submit_btn" type="submit" value="Submit" />
 				</form>
 			</div>
 		</div>
+		<script>
+			var form_fields = document.getElementsByName('coin-buy-input')
+			form_fields[0].placeholder='#..';
+		</script>
 	</body>
 	{% endblock %}
 </html>

@@ -3,8 +3,10 @@ from django.contrib.auth.forms  import UserCreationForm
 from django.contrib.auth.models import User
 from django.contrib.auth.mixins import LoginRequiredMixin
 
-from .models import Portfolio
+from .models import Coin, Portfolio, Transaction
 
+
+COIN_CHOICES = Coin.__subclasses__()
 
 class UserCreateForm(UserCreationForm):
     class Meta:
@@ -22,14 +24,27 @@ class UserCreateForm(UserCreationForm):
 class PortfolioCreateForm(LoginRequiredMixin, forms.ModelForm):
     class Meta:
         model  = Portfolio
-        fields = ("nickname", "investment")
+        fields = (
+            "nickname",
+            "balance"
+        )
 
 
-class PortfolioUpdateForm(forms.ModelForm):
+class PortfolioUpdateForm(LoginRequiredMixin, forms.ModelForm):
     class Meta:
         model  = Portfolio
         fields = (
             "nickname",
-            "investment",
+        )
+
+
+class TransactionCreateForm(LoginRequiredMixin, forms.ModelForm):
+    class Meta:
+        model  = Transaction
+        fields = (
+            "coin_count",
+            "coin_cost",
+            "portfolio",
+            "coin",
         )
 

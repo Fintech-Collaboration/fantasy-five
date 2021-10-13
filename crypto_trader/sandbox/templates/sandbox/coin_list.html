@@ -76,7 +76,7 @@
 			</tr> 
 			{% for coin in coin_data|dictsort:"name" %}
 				<tr>
-					<td><a href="{% url 'coinbuy' coin.name|cut:' ' %}"><button>Buy</button></a></td>
+					<td><a href="{% url 'transactioncreate' coin.name|cut:' ' %}"><button>Buy</button></a></td>
 					<td><a href="{% url 'coinpage' coin.name|cut:' ' %}">{{ coin.ticker }}</a></td>
 					<td>{{ coin.name }}</td>
 					<td>${{ coin.price_open }}</td>

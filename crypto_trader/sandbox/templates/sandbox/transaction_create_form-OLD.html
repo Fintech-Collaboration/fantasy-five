@@ -9,8 +9,8 @@
 		<title>Signup</title>
 
 		<style>
-			.portfolio_card,
-			.portfolio_card_sub {
+			.transaction_card,
+			.transaction_card_sub {
 				display: flex;
 				flex-direction: column;
 				-webkit-box-align: center;
@@ -24,7 +24,7 @@
 				border-radius: 5px;
 
 			}
-			.portfolio_card_sub {
+			.transaction_card_sub {
 				width: 400px;
 				padding-bottom: 20px;
 				background-color: lightpink;
@@ -66,15 +66,13 @@
 	<body>
 		<div class="container h-50">
 			<div class="d-flex justify-content-center h-100">
-				<div class="portfolio_card">		
-					<div class="portfolio_card_sub">
+				<div class="transaction_card">		
+					<div class="transaction_card_sub">
 						<form method="POST">
-							<h3>Create Portfolio</h3>
+							<h3>Create Transaction</h3>
 							{% csrf_token %}
-							<div class="nickname_label_container">{{ form.nickname.label }}</div>
-							<div class="nickname_field_container">{{ form.nickname }}</div><br>
-							<div class="investment_label_container">{{ form.balance.label }}</div>
-							<div class="investment_field_container">{{ form.balance }}</div>
+							<div class="coin_label_container">{{ form.coin_list.label }}</div>
+							<div class="coin_field_container">{{ form.coin_list }}</div><br>
 							<div class="submit_container">
 								<input class="btn submit_btn" type="submit" value="Submit" />
 							</div>
@@ -92,7 +90,7 @@
 	
 		<script>
 			var form_fields = document.getElementsByTagName('input')
-			form_fields[1].placeholder='Portfolio nickname..';
+			form_fields[1].placeholder='#..';
 			form_fields[2].placeholder='USD..';
 
 			for (var field in form_fields){	

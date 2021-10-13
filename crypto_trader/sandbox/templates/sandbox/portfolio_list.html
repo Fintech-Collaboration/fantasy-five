@@ -1,29 +1,32 @@
 {% extends './base.html' %}
-{% block content %}
-<h2>Portfolio List</h2>
-<a href="{% url 'portfoliocreate' %}"><button class="btn">Add Portfolio</button></a>
-<table id="portfolio">
-  <tr>
-    <th>Portfolio Nickname</th>
-    <th>Coins</th>
-    <th>Investment</th>
-    <th>Balance</th>
-    <th>Owner</th>
-      <th> </th>
-      <th> </th>
-  </tr>
-  {% for portfolio in portfolio_list %}
-    {% if request.user.username == portfolio.owner.username %}
-      <tr>
-          <td>{{ portfolio.nickname }}</td>
-          <td>{{ portfolio.coin_list }}</td>
-          <td>{{ portfolio.investment }}</td>
-          <td>{{ portfolio.balance }}</td>
-          <td>{{ portfolio.owner.username }}</td>
-          <td><a href="{% url 'portfolioupdate' portfolio.id %}"><button>Edit</button></a></td>
-          <td><a href="{% url 'portfoliodelete' portfolio.id %}"><button>Delete</button></a></td>
-      </tr>
-    {% endif %}
-  {% endfor %}
-</table>
-{% endblock %}
+{% load static %}
+
+<DOCTYPE html>
+<html lang="en">
+  {% block content %}
+  <h2>Portfolio List</h2>
+  <a href="{% url 'portfoliocreate' %}"><button class="btn">Add Portfolio</button></a>
+  <table id="portfolio">
+    <tr>
+      <th>Nickname</th>
+      <th>Investment</th>
+      <th>Balance</th>
+      <th>Owner</th>
+        <th> </th>
+        <th> </th>
+    </tr>
+    {% for portfolio in portfolio_list %}
+      {% if request.user.username == portfolio.owner.username %}
+        <tr>
+            <td><a href="{% url 'portfoliotransaction' portfolio.nickname %}">{{ portfolio.nickname }}</a></td>
+            <td>{{ portfolio.investment }}</td>
+            <td>{{ portfolio.balance }}</td>
+            <td>{{ portfolio.owner.username }}</td>
+            <td><a href="{% url 'portfolioupdate' portfolio.id %}"><button>Edit</button></a></td>
+            <td><a href="{% url 'portfoliodelete' portfolio.id %}"><button>Delete</button></a></td>
+        </tr>
+      {% endif %}
+    {% endfor %}
+  </table>
+  {% endblock %}
+</html>

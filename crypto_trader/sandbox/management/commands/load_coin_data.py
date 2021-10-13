@@ -67,6 +67,8 @@ class Command(BaseCommand):
                 coin.trades_count  = row["trades_count"]
                 coin.ticker        = ticker
                 coin.name          = name if name.lower() != "ethereumclassic" else "ethereum classic"
+                coin.count         = 0.0
+                coin.portfolio     = None
 
                 start_date         = row[date_col]
                 coin.start_date = UTC.localize(
