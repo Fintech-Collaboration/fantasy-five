@@ -1,3 +1,7 @@
+import pickle
+
+import pandas as pd
+
 from datetime          import datetime
 from plotly.offline    import plot
 from plotly.graph_objs import Scatter
@@ -11,8 +15,7 @@ from django.contrib.auth            import logout, login
 from django.views.generic           import ListView
 from django.views.generic.edit      import CreateView, DeleteView, UpdateView
 from django.contrib                 import messages
-from django.http                    import Http404
-from django.template.defaultfilters import slugify, time
+from django.http                    import Http404, HttpResponse
 from django.db.models               import Q
 
 from .utils.coin import icon_path, get_coin_data
@@ -117,7 +120,45 @@ def line_plot():
 
     return plt
 
+def ml_models(request):        
+    if 'gNB' in request.POST:
+        gaussian = pickle.load(open('gNB.sav','rb'))
+        y_pred = gaussian.predict(test_data_preprocessed)
+        output = pd.DataFrame(y_pred)
+        output.to_csv('gaussianNB.csv')
+        
+        filename = 'gaussianNB.csv'
+        response = HttpResponse(open(filename, 'rb').read(),    content_type='text/csv')               
+        response['Content-Length'] = os.path.getsize(filename)
+        response['Content-Disposition'] = 'attachment; filename=%s' % 'gaussianNB.csv'
+        return response
+    
+    if 'multiNB' in request.POST:
+        multi = pickle.load(open('classifier_multi_NB.sav','rb'))
+        y_pred = multi.predict(test_data_preprocessed)
+        output = pd.DataFrame(y_pred)
+        output.to_csv('multi_NB.csv')
+        
+        filename = 'multi_NB.csv'
+        response = HttpResponse(open(filename, 'rb').read(), content_type='text/csv')                
+        response['Content-Length'] = os.path.getsize(filename)
+        response['Content-Disposition'] = 'attachment; filename=%s' % 'multi_NB.csv'
+        return response
+    
+    if 'rf' in request.POST:
+        rf = pickle.load(open('random_forest.sav','rb'))
+        y_pred = rf.predict(test_data_preprocessed)
+        output = pd.DataFrame(y_pred)
+        output.to_csv('rf.csv')
+        
+        filename = 'rf.csv'
+        response = HttpResponse(open(filename, 'rb').read(), content_type='text/csv')             
+        response['Content-Length'] = os.path.getsize(filename)
+        response['Content-Disposition'] = 'attachment; filename=%s' % 'rf.csv'
+        return response
 
+
+""" WALLET METHODS """
 def coin_table(request):
     coin_data = []
     for coin in COIN_MODELS:
@@ -163,6 +204,7 @@ def coin_page(request, ticker):
     return render(request, f"sandbox/coin_page.html", context)
 
 
+@login_required(login_url="login")
 def transaction_create_view(request, ticker):
     form = TransactionCreateForm(request.POST or None)
     if form.is_valid():
@@ -193,6 +235,7 @@ def transaction_create_view(request, ticker):
     return render(request, "sandbox/transaction_create.html", context)
 
 
+@login_required(login_url="login")
 def transaction_execute(request, ticker):
     if request.method == "POST":
         portfolio_nickname = request.POST["portfolio-buy-select"]
@@ -218,12 +261,10 @@ def transaction_execute(request, ticker):
         )
         t.save()
 
-    context = {}
-
     return redirect("transactionlist")
-    # return render(request, "transaction_list.html", context)
+""" -------------- """
 
-
+""" WALLET CLASSES """
 class CoinList(ListView):
     model = Coin
 
@@ -256,4 +297,5 @@ class PortfolioDelete(LoginRequiredMixin, DeleteView):
     model         = Portfolio
     template_name = "sandbox/portfolio_delete_form.html"
     success_url   = reverse_lazy("portfoliolist")
+""" -------------- """
 

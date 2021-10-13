@@ -1,6 +1,10 @@
-from crypto_trader.sandbox.utils.db_tools import db_read, db_current_price
+import pickle
 
+pkl_file = r"C:\Users\JasonGarcia24\FINTECH\workspace\fantasy-five\crypto_trader\sandbox\data\aave_model.pkl"
 
-db_data = db_read("BTC")
-print(db_current_price(db_data))
+with open(pkl_file, 'rb') as f:
+    data = pickle.load(f)
 
+breakpoint()
+
+gh = 1

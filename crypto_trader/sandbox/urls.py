@@ -13,7 +13,7 @@ urlpatterns = [
   path("coin/table/",                       views.coin_table,              name="cointable"),
   path("coin/<slug:ticker>/",               views.coin_page,               name="coinpage"),
   path("transaction/create/<slug:ticker>/", views.transaction_create_view, name="transactioncreate"),
-  path("<slug:ticker>",                    views.transaction_execute,     name="transactionexecute"),
+  path("<slug:ticker>",                     views.transaction_execute,     name="transactionexecute"),
 
   path("coin/list/",             views.CoinList.as_view(),        name="coinlist"),
   path("portfolio/list/",        views.PortfolioList.as_view(),   name="portfoliolist"),
