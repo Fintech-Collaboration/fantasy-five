@@ -36,8 +36,8 @@
               <p class="coin-name-p">{{ coin_name }}</p>
           </div>
           <div>
-            <a href="{% url 'transactioncreate' name|cut:' ' %}"><button>Buy</button></a>
-          </div>
+            <a href="{% url 'transactioncreate' ticker %}"><button>Buy</button></a>
+          </div><br>
 
           <table id="coins">
             <tr>

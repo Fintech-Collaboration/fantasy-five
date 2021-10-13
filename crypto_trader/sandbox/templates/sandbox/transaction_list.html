@@ -1,0 +1,31 @@
+{% extends './base.html' %}
+{% load static %}
+
+<DOCTYPE html>
+<html lang="en">
+  {% block content %}
+  <h2>Transaction List</h2>
+  <table id="transaction">
+    <tr>
+      <th>Date</th>
+      <th>Coin Count</th>
+      <th>Total Cost</th>
+      <th>Coin Purchased</th>
+      <th>Portfolio</th>
+        <th> </th>
+        <th> </th>
+    </tr>
+    {% for transaction in transactions %}
+      {% if request.user.username == transaction.portfolio.owner.username %}
+        <tr>
+            <td>{{ transaction.time_executed }}</td>
+            <td>{{ transaction.coin_count }}</td>
+            <td>{{ transaction.coin_cost }}</td>
+            <td>{{ transaction.coin }}</td>
+            <td><a href="{% url 'portfoliolist' %}">{{ transaction.portfolio.nickname }}</a></td>
+        </tr>
+      {% endif %}
+    {% endfor %}
+  </table>
+  {% endblock %}
+</html>

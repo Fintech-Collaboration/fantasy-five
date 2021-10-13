@@ -1,3 +1,4 @@
+from datetime          import datetime
 from plotly.offline    import plot
 from plotly.graph_objs import Scatter
 
@@ -11,7 +12,7 @@ from django.views.generic           import ListView
 from django.views.generic.edit      import CreateView, DeleteView, UpdateView
 from django.contrib                 import messages
 from django.http                    import Http404
-from django.template.defaultfilters import slugify
+from django.template.defaultfilters import slugify, time
 from django.db.models               import Q
 
 from .utils.coin import icon_path, get_coin_data
@@ -136,16 +137,16 @@ def coin_table(request):
     return render(request, "sandbox/coin_list.html", context)
 
 
-def coin_page(request, name):
+def coin_page(request, ticker):
     try:
-        coin = next(filter(lambda m: m.__name__.lower() == name.lower(), COIN_MODELS))
+        coin = next(filter(lambda m: m.__ticker__.lower() == ticker.lower(), COIN_MODELS))
     except Coin.DoesNotExist:
         return Http404(f"Coin not found!")
     
     pull_func = lambda col: coin.objects.values_list(col, flat=True).order_by("-start_date")
 
     context = dict(        
-        ticker    = coin.objects.last().ticker.upper(),
+        ticker    = ticker,
         name      = coin.objects.last().name.capitalize(),
         count     = coin.objects.count(),
         coin_data = zip(
@@ -162,73 +163,65 @@ def coin_page(request, name):
     return render(request, f"sandbox/coin_page.html", context)
 
 
-# portfolio_select coin_id coin_count
-def transaction_create_view(request, coin_name):
+def transaction_create_view(request, ticker):
     form = TransactionCreateForm(request.POST or None)
     if form.is_valid():
         form.save()
 
     # Get the latest instance of the current coin
-    coin_data_all    = Coin.objects.filter( Q(Coin___name = coin_name))
+    coin_data_all    = Coin.objects.filter( Q(Coin___ticker = ticker.lower()))
     coin_data_length = len(coin_data_all)-1
     coin_data_now    = coin_data_all[coin_data_length]
 
     # Get only this user's portfolios
     user_portfolios = [p for p in form.fields["portfolio"]._queryset if p.owner.username == request.user.username]
-    print(user_portfolios)
 
     context = dict(
-        form          = form,
-        portfolio     = user_portfolios,
-        coin_name     = coin_name,
-        start_date    = coin_data_now.start_date,
+        portfolios    = user_portfolios,
+        coin_name     = coin_data_now.name,
+        start_date    = coin_data_now.start_date.strftime("%Y-%b-%d"),
         price_open    = coin_data_now.price_open,
         price_high    = coin_data_now.price_high,
         price_low     = coin_data_now.price_low,
         price_close   = coin_data_now.price_close,
         volume_traded = coin_data_now.volume_traded,
         trades_count  = coin_data_now.trades_count,
-        ticker        = coin_data_now.ticker.upper(),
+        ticker        = ticker.upper(),
         coin_icon     = icon_path(coin_data_now.ticker.upper()),
     )
 
-    return render(request, f"sandbox/transaction_create.html", context)
+    return render(request, "sandbox/transaction_create.html", context)
 
 
-def coin_buy(request, name):
-    try:
-        coin = next(filter(lambda m: m.__name__.lower() == name.lower(), COIN_MODELS))
-    except Coin.DoesNotExist:
-        return Http404(f"Coin not found!")
-    
-    username = request.user.username
-
+def transaction_execute(request, ticker):
     if request.method == "POST":
-        selected  = request.POST["coin-buy-select"]
-        count     = request.POST["coin-buy-count"]
-        portfolio = [p for p in Portfolio.objects.all() if p.nickname == selected][0]
+        portfolio_nickname = request.POST["portfolio-buy-select"]
+        coin_count         = float(request.POST["coin-buy-input"])
+        print(f"{portfolio_nickname} - {coin_count} - {ticker}")
 
+        # Get the latest instance of the current coin
+        coin_data_all    = Coin.objects.filter( Q(Coin___ticker = ticker.lower()))
+        coin_data_length = len(coin_data_all)-1
 
-        portfolio.coin_list = f"{portfolio.coin_list}, {coin.__coinid__}" if portfolio.coin_list else f"{coin.__coinid__}"
-    else:
-        portfolio = None    
+        # Set transaction data
+        coin_data_now    = coin_data_all[coin_data_length]
+        coin_cost        = coin_count * float(coin_data_now.price_close)
+        portfolio        = Portfolio.objects.all().filter(nickname = portfolio_nickname)[0]
+        time_executed    = datetime.now()
 
-    context = dict(        
-        ticker        = coin.objects.last().ticker.upper(),
-        name          = coin.objects.last().name.capitalize(),
-        coin_id       = coin.__coinid__,
-        start_date    = coin.objects.last().start_date.strftime("%Y-%b-%d"),
-        price_open    = f"{coin.objects.last().price_open:,.2f}",
-        price_high    = f"{coin.objects.last().price_high:,.2f}",
-        price_low     = f"{coin.objects.last().price_low:,.2f}",
-        price_close   = f"{coin.objects.last().price_close:,.2f}",
-        volume_traded = f"{coin.objects.last().volume_traded:,.0f}",
-        trades_count  = f"{coin.objects.last().trades_count:,.0f}",
-        portfolio     = portfolio,
-        coin_icon     = icon_path(coin.__ticker__),
-    )
+        t = Transaction(
+            time_executed=time_executed,
+            coin_count=coin_count,
+            coin_cost=coin_cost,
+            coin=coin_data_now,
+            portfolio=portfolio,
+        )
+        t.save()
 
-    return render(request, f"sandbox/coin_buy.html", context)
+    context = {}
+
+    return redirect("transactionlist")
+    # return render(request, "transaction_list.html", context)
 
 
 class CoinList(ListView):
@@ -236,19 +229,21 @@ class CoinList(ListView):
 
 
 class PortfolioList(LoginRequiredMixin, ListView):
-    model = Portfolio
+    queryset = Portfolio.objects.order_by("-balance")
+    model    = Portfolio
+    context_object_name  = "portfolios"
+
+
+class TransactionList(LoginRequiredMixin, ListView):
+    queryset = Transaction.objects.order_by("-time_executed")
+    model    = Transaction
+    context_object_name  = "transactions"
 
 
 class PortfolioCreate(LoginRequiredMixin, CreateView):
     model         = Portfolio
     template_name = "sandbox/portfolio_create_form.html"
     form_class    = PortfolioCreateForm
-
-
-# class TransactionCreate(LoginRequiredMixin, CreateView):
-#     model         = Transaction
-#     template_name = "sandbox/transaction_create.html"
-#     form_class    = TransactionCreateForm
 
 
 class PortfolioUpdate(LoginRequiredMixin, UpdateView):

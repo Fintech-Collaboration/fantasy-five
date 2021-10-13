@@ -15,10 +15,10 @@
         <th> </th>
         <th> </th>
     </tr>
-    {% for portfolio in portfolio_list %}
+    {% for portfolio in portfolios %}
       {% if request.user.username == portfolio.owner.username %}
         <tr>
-            <td><a href="{% url 'portfoliotransaction' portfolio.nickname %}">{{ portfolio.nickname }}</a></td>
+            <td><a href="{% url 'portfolioupdate' portfolio.id %}">{{ portfolio.nickname }}</a></td>
             <td>{{ portfolio.investment }}</td>
             <td>{{ portfolio.balance }}</td>
             <td>{{ portfolio.owner.username }}</td>

@@ -62,7 +62,7 @@
 	<div class="container h-50">
 		<div class="d-flex justify-content-center h-100">
 		<div class="portfolio_card">
-			<table id="coins">
+			<table id="coin_table">
 			<tr>
 				<th> </th>
 				<th>Ticker</th>
@@ -76,8 +76,8 @@
 			</tr> 
 			{% for coin in coin_data|dictsort:"name" %}
 				<tr>
-					<td><a href="{% url 'transactioncreate' coin.name|cut:' ' %}"><button>Buy</button></a></td>
-					<td><a href="{% url 'coinpage' coin.name|cut:' ' %}">{{ coin.ticker }}</a></td>
+					<td><a href="{% url 'transactioncreate' coin.ticker %}"><button>Buy</button></a></td>
+					<td><a href="{% url 'coinpage' coin.ticker %}">{{ coin.ticker }}</a></td>
 					<td>{{ coin.name }}</td>
 					<td>${{ coin.price_open }}</td>
 					<td>${{ coin.price_high }}</td>
