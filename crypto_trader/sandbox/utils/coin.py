@@ -6,7 +6,7 @@ import pandas as pd
 from pathlib import Path
 
 
-BASE_DIR = r"C:\Users\JasonGarcia24\FINTECH\workspace\fantasy-five\crypto_trader\sandbox\data"
+BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 def icon_path(ticker):   
@@ -14,7 +14,7 @@ def icon_path(ticker):
 
 
 def get_coin_data(name, ticker):
-    data_file = os.path.join(BASE_DIR, f"{name.lower()}_5_year.csv")
+    data_file = os.path.join(BASE_DIR, "data", f"{name.lower()}_5_year.csv")
 
     df = pd.read_csv(
         Path(data_file),

@@ -1,11 +1,12 @@
 import pickle
 
 import pandas as pd
+import numpy  as np
 import plotly.graph_objects as go
 
 from datetime          import datetime
 from plotly.offline    import plot
-from plotly.graph_objs import Scatter
+from plotly.graph_objs import Scatter, Layout
 
 from django.urls                    import reverse_lazy
 from django.shortcuts               import render, redirect
@@ -103,28 +104,141 @@ def home(request):
 
 
 def line_plot(name, ticker):
-    coin_df = get_coin_data(name, ticker)
+    name  = "".join(name.split(" "))
+    short = 50
+    long  = 100
+
+    coin_df = dmac(get_coin_data(name, ticker), short=short, long=long)
     x_data  = coin_df.index
     y_data  = coin_df["price_close"]
 
-    fig = go.Figure()
+    y_short_data = coin_df["SMA_short"]
+    y_long_data  = coin_df["SMA_long"]
 
-    trace = Scatter(
+    x_entry_data = coin_df[coin_df["entry_exit"] ==  1.0].index
+    y_entry_data = coin_df[coin_df["entry_exit"] ==  1.0]["price_close"]
+    x_exit_data  = coin_df[coin_df["entry_exit"] == -1.0].index
+    y_exit_data  = coin_df[coin_df["entry_exit"] == -1.0]["price_close"]
+
+    customdata = np.stack((
+        coin_df['price_open'],    #0
+        coin_df['price_high'],    #1
+        coin_df['price_low'],     #2
+        coin_df['volume_traded'], #3
+        coin_df['trades_count'],  #4
+
+    ), axis=-1)
+
+    hovertemplate = """
+    <b>%{x}<br>
+    Daily Close:  $%{y:,12.2g}</b><br><br>
+    Daily Open:   $%{customdata[0]:,12.2g}<br>
+    Daily High:   $%{customdata[1]:,12.2g}<br>
+    Daily Low:    $%{customdata[2]:,12.2g}<br>
+    Daily Volume:  %{customdata[3]:,.0f}<br>
+    Trade Count:   %{customdata[4]:,.0f}
+    <extra></extra>
+    """
+    layout = go.Layout(
+        title = "Sine and cos",
+        xaxis = {'title':'angle'},
+        yaxis = {'title':'value'}
+    )
+
+    trace_data = Scatter(
         x=x_data,
         y=y_data,
         mode='lines',
         name=ticker.upper(),
-        # title="test",
         opacity=0.8,
         marker_color='green',
+        customdata=customdata,
+        hovertemplate=hovertemplate,
+        legendrank=1,
+        showlegend=False,
     )
 
-    fig.add_trace(trace)
-    # fig.update_
-    
-    plt = plot([fig,], output_type='div')
+    trace_short = Scatter(
+        x=x_data,
+        y=y_short_data,
+        mode='lines',
+        name=f"{short} Day SMA",
+        opacity=0.5,
+        marker_color='blue',
+        customdata=customdata,
+        hovertemplate=hovertemplate,
+        legendgroup="sma-lines",
+        legendgrouptitle_text="Simple Moving Avgs",
+        legendrank=2,
+    )
+
+    trace_long = Scatter(
+        x=x_data,
+        y=y_long_data,
+        mode='lines',
+        name=f"{long} Day SMA",
+        opacity=0.5,
+        marker_color='orange',
+        customdata=customdata,
+        hovertemplate=hovertemplate,
+        legendgroup="sma-lines",
+        legendrank=3,
+    )
+
+    trace_entry = Scatter(
+        x=x_entry_data,
+        y=y_entry_data,
+        mode='markers',
+        name="Entry Point",
+        opacity=0.8,
+        marker_color='purple',
+        marker_symbol="triangle-up",
+        marker_size=10,
+        customdata=customdata,
+        hovertemplate=hovertemplate,
+        legendgroup="entry_exit-point",
+        legendgrouptitle_text="SMA Entry/Exit",
+        visible="legendonly",
+        legendrank=4,
+    )
+
+    trace_exit = Scatter(
+        x=x_exit_data,
+        y=y_exit_data,
+        mode='markers',
+        name="Exit Point",
+        opacity=0.8,
+        marker_color='red',
+        marker_symbol="triangle-down",
+        marker_size=10,
+        customdata=customdata,
+        hovertemplate=hovertemplate,
+        legendgroup="entry_exit-point",
+        visible="legendonly",
+        legendrank=5,
+    )
+
+    plt = plot(
+        [trace_data, trace_short, trace_long, trace_entry, trace_exit],
+        output_type='div',
+    )
 
     return plt
+
+
+def dmac(df, short=50, long=100):
+    df["SMA_short"] = df["price_close"].rolling(window=short).mean()
+    df["SMA_long"]  = df["price_close"].rolling(window=long ).mean()
+    df["signal"]    = 0.0
+
+    df["signal"][short:] = np.where(
+        df["SMA_short"][short:] > df["SMA_long"][short:], 1.0, 0.0
+    )
+
+    df["entry_exit"] = df["signal"].diff()
+
+    return df
+
 
 
 def list_coin_data():
