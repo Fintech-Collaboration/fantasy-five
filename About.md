@@ -20,13 +20,15 @@
 ##### [GitHub] (https://github.com/mbejan325)
 ##### [Email] (mbejan@scu.edu)
 
+<img src="pictures/michael.jpg" width="200" />
+
 
 ### Jason Garcia 
 ##### [LinkedIN] ()
 ##### [GitHub] (https://github.com/jasonjgarcia24)
 ##### [Email] (jason.garcia24@gmail.com)
 
-<img src="jason.jpg" width="200" />
+<img src="pictures/jason.jpg" width="200" />
 
 ### Srini Goda
 ##### [LinkedIN] ()
