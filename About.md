@@ -26,7 +26,7 @@
 ##### [GitHub] (https://github.com/jasonjgarcia24)
 ##### [Email] (jason.garcia24@gmail.com)
 
-![markdown-image](jason.jpg =100x20)
+<img src="jason.jpg" width="200" />
 
 ### Srini Goda
 ##### [LinkedIN] ()
