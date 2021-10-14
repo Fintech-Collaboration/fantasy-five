@@ -2,7 +2,10 @@
 {% load static %}
 
 <DOCTYPE html>
-<html lang="en">
+<html lang="en">  
+  <link href="http://cdn.pydata.org/bokeh/release/bokeh-2.3.3.min.css" rel="stylesheet" type="text/css">
+  <link href="http://cdn.pydata.org/bokeh/release/bokeh-widgets-2.3.3.min.css" rel="stylesheet" type="text/css">
+  
   {% block content %}
   <head>
     <title>Coin Table</title>
@@ -12,7 +15,7 @@
         flex-direction: column;
         -webkit-box-align: center;
         align-items: center;
-        width: 750px;
+        width: 900px;
         margin: 0px auto;
         background: powderblue;
         box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
@@ -23,11 +26,16 @@
     </style>
   </head>
 
-  <body>    
+  <body>
+    <script src="https://cdn.bokeh.org/bokeh/release/bokeh-2.3.3.min.js"></script>
+    <script src="https://cdn.bokeh.org/bokeh/release/bokeh-widgets-2.3.3.min.js"></script>
+    <script src="https://cdn.bokeh.org/bokeh/release/bokeh-tables-2.3.3.min.js"></script>
+    <script src="https://cdn.bokeh.org/bokeh/release/bokeh-api-2.3.3.min.js"></script>
+
     <div class="container h-50">
       <div class="d-flex justify-content-center h-100">
         <div class="portfolio_card">
-          
+  
           <div class="coin-icon-div">
             <img class="coin-icon-img" src="{% static coin_icon %}" alt={{ ticker }}>
             <label class="coin-icon-label">{{ ticker }}</label><br>
@@ -38,6 +46,14 @@
           <div>
             <a href="{% url 'transactioncreate' ticker %}"><button>Buy</button></a>
           </div><br>
+
+          <div class="portfolio_card">
+            {% autoescape off %}
+            {% block body %}
+            <div class="plot-div">{{ coin_plot }}</div>
+            {% endblock %}
+            {% endautoescape %}
+          </div><br><br>
 
           <table id="coins">
             <tr>

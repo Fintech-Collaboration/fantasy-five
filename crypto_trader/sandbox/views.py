@@ -1,6 +1,7 @@
 import pickle
 
 import pandas as pd
+import plotly.graph_objects as go
 
 from datetime          import datetime
 from plotly.offline    import plot
@@ -18,7 +19,8 @@ from django.contrib                 import messages
 from django.http                    import Http404, HttpResponse
 from django.db.models               import Q
 
-from .utils.coin import icon_path, get_coin_data
+from .utils.coin         import icon_path, get_coin_data
+from .utils.ohlc_forecast import crypto_forecast
 
 from .models import (
     Portfolio,
@@ -88,78 +90,44 @@ def home(request):
     ticker = USE_MODEL.__ticker__
     name   = USE_MODEL.__name__
 
+    coin_data = list_coin_data()
     coin_icon = icon_path(ticker)
-    coin_plot = line_plot()
 
     context = {
         "ticker":    ticker.upper(),
         "coin_name": name,
+        "coin_data": coin_data,
         "coin_icon": coin_icon,
-        "coin_plot": coin_plot,
     }
     return render(request, "sandbox/home.html", context)
 
 
-def line_plot():
-    ticker = USE_MODEL.__ticker__
-    name   = USE_MODEL.__name__
-
+def line_plot(name, ticker):
     coin_df = get_coin_data(name, ticker)
     x_data  = coin_df.index
     y_data  = coin_df["price_close"]
 
-    plt = plot([Scatter(
+    fig = go.Figure()
+
+    trace = Scatter(
         x=x_data,
         y=y_data,
         mode='lines',
         name=ticker.upper(),
+        # title="test",
         opacity=0.8,
         marker_color='green',
-    )],
-    output_type='div')
+    )
+
+    fig.add_trace(trace)
+    # fig.update_
+    
+    plt = plot([fig,], output_type='div')
 
     return plt
 
-def ml_models(request):        
-    if 'gNB' in request.POST:
-        gaussian = pickle.load(open('gNB.sav','rb'))
-        y_pred = gaussian.predict(test_data_preprocessed)
-        output = pd.DataFrame(y_pred)
-        output.to_csv('gaussianNB.csv')
-        
-        filename = 'gaussianNB.csv'
-        response = HttpResponse(open(filename, 'rb').read(),    content_type='text/csv')               
-        response['Content-Length'] = os.path.getsize(filename)
-        response['Content-Disposition'] = 'attachment; filename=%s' % 'gaussianNB.csv'
-        return response
-    
-    if 'multiNB' in request.POST:
-        multi = pickle.load(open('classifier_multi_NB.sav','rb'))
-        y_pred = multi.predict(test_data_preprocessed)
-        output = pd.DataFrame(y_pred)
-        output.to_csv('multi_NB.csv')
-        
-        filename = 'multi_NB.csv'
-        response = HttpResponse(open(filename, 'rb').read(), content_type='text/csv')                
-        response['Content-Length'] = os.path.getsize(filename)
-        response['Content-Disposition'] = 'attachment; filename=%s' % 'multi_NB.csv'
-        return response
-    
-    if 'rf' in request.POST:
-        rf = pickle.load(open('random_forest.sav','rb'))
-        y_pred = rf.predict(test_data_preprocessed)
-        output = pd.DataFrame(y_pred)
-        output.to_csv('rf.csv')
-        
-        filename = 'rf.csv'
-        response = HttpResponse(open(filename, 'rb').read(), content_type='text/csv')             
-        response['Content-Length'] = os.path.getsize(filename)
-        response['Content-Disposition'] = 'attachment; filename=%s' % 'rf.csv'
-        return response
 
-
-""" WALLET METHODS """
-def coin_table(request):
+def list_coin_data():
     coin_data = []
     for coin in COIN_MODELS:
         coin_data.append(dict(
@@ -173,7 +141,13 @@ def coin_table(request):
             trades_count  = coin.objects.last().trades_count,
         ))
 
-        context = {"coin_data": coin_data}
+    return coin_data
+
+
+""" WALLET METHODS """
+def coin_table(request):
+    coin_data = list_coin_data()
+    context   = {"coin_data": coin_data}
         
     return render(request, "sandbox/coin_list.html", context)
 
@@ -186,9 +160,12 @@ def coin_page(request, ticker):
     
     pull_func = lambda col: coin.objects.values_list(col, flat=True).order_by("-start_date")
 
+    name = coin.objects.last().name.capitalize()
+    coin_plot = line_plot(name, ticker)
+
     context = dict(        
         ticker    = ticker,
-        name      = coin.objects.last().name.capitalize(),
+        name      = name,
         count     = coin.objects.count(),
         coin_data = zip(
             pull_func("start_date"),
@@ -199,6 +176,7 @@ def coin_page(request, ticker):
             pull_func("volume_traded"),
             pull_func("trades_count")),
             coin_icon = icon_path(coin.__ticker__),
+        coin_plot = coin_plot,
     )
 
     return render(request, f"sandbox/coin_page.html", context)
