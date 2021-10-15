@@ -1,0 +1,15 @@
+{% extends 'sandbox/base.html' %}
+{% load static %}
+
+<DOCTYPE html>
+<html lang="en">
+    {% block content %}
+    <body>
+        {% autoescape off %}
+        {% block body %}
+            <div class="plot-div">{{ coin_plot }}</div>
+        {% endblock %}
+        {% endautoescape %}
+    </body>
+    {% endblock %}
+</html>

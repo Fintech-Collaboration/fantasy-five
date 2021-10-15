@@ -1,0 +1,32 @@
+{% extends './base.html' %}
+{% load static %}
+
+<DOCTYPE html>
+<html lang="en">
+  {% block content %}
+  <h2>Portfolio List</h2>
+  <a href="{% url 'portfoliocreate' %}"><button class="btn">Add Portfolio</button></a>
+  <table id="portfolio">
+    <tr>
+      <th>Nickname</th>
+      <th>Investment</th>
+      <th>Balance</th>
+      <th>Owner</th>
+        <th> </th>
+        <th> </th>
+    </tr>
+    {% for portfolio in portfolios %}
+      {% if request.user.username == portfolio.owner.username %}
+        <tr>
+            <td><a href="{% url 'portfolioupdate' portfolio.id %}">{{ portfolio.nickname }}</a></td>
+            <td>{{ portfolio.investment }}</td>
+            <td>{{ portfolio.balance }}</td>
+            <td>{{ portfolio.owner.username }}</td>
+            <td><a href="{% url 'portfolioupdate' portfolio.id %}"><button>Edit</button></a></td>
+            <td><a href="{% url 'portfoliodelete' portfolio.id %}"><button>Delete</button></a></td>
+        </tr>
+      {% endif %}
+    {% endfor %}
+  </table>
+  {% endblock %}
+</html>

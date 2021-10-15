@@ -1,0 +1,114 @@
+{% extends './coinbase.html' %}
+{% load static %}
+
+<DOCTYPE html>
+<html lang="en">  
+  <link href="http://cdn.pydata.org/bokeh/release/bokeh-2.3.3.min.css" rel="stylesheet" type="text/css">
+  <link href="http://cdn.pydata.org/bokeh/release/bokeh-widgets-2.3.3.min.css" rel="stylesheet" type="text/css">
+  
+  {% block content %}
+  <head>
+    <title>Coin Table</title>
+    <style>
+      .portfolio_card,
+      .coin_table_card_sub {
+        display: flex;
+        flex-direction: column;
+        -webkit-box-align: center;
+        align-items: center;
+        width: 1200px;
+        margin: 0px auto;
+        background: powderblue;
+        box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+        -webkit-box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+        -moz-box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+        border-radius: 5px;
+      }
+			.coin_algo_card_sub,
+      .coin_table_card_sub {
+				padding-bottom: 5px;
+        margin-bottom: 5px;
+				background: lightpink;
+        border-radius: 5px;
+			}
+			.coin_algo_card_sub {
+				width: 1200px;
+			}
+			.coin_table_card_sub {
+				width: 750px;
+			}
+    </style>
+  </head>
+
+  <body>
+    <script src="https://cdn.bokeh.org/bokeh/release/bokeh-2.3.3.min.js"></script>
+    <script src="https://cdn.bokeh.org/bokeh/release/bokeh-widgets-2.3.3.min.js"></script>
+    <script src="https://cdn.bokeh.org/bokeh/release/bokeh-tables-2.3.3.min.js"></script>
+    <script src="https://cdn.bokeh.org/bokeh/release/bokeh-api-2.3.3.min.js"></script>
+
+    <div class="container h-50">
+      <div class="d-flex justify-content-center h-100">
+        <div class="portfolio_card">
+  
+          <div class="coin-icon-div">
+            <img class="coin-icon-img" src="{% static coin_icon %}" alt={{ ticker }}>
+            <label class="coin-icon-label">{{ ticker }}</label><br>
+          </div>
+          <div class="coin-name-div">
+              <p class="coin-name-p">{{ coin_name }}</p>
+          </div>
+          <div>
+            <a href="{% url 'transactioncreate' ticker %}"><button>Buy</button></a>
+          </div><br>
+
+          <div class="coin_algo_card_sub">
+            <h3>Smooth Moving Average</h3>
+            {% block body %}
+            <div class="portfolio_card">
+              {% autoescape off %}
+              <div class="plot-div">{{ coin_plot }}</div>
+              {% endautoescape %}
+            </div><br><br>
+          </div><br><br>
+
+          <div class="coin_algo_card_sub">
+            <h3>Timeseries Forecasting</h3>
+            <div class="portfolio_card">
+              {% autoescape off %}
+              <div class="plot-div">{{ forecast_plot }}</div>
+              {% endautoescape %}
+            </div><br><br>
+          </div><br><br>
+          {% endblock %}
+
+          <div class="coin_table_card_sub">
+            <h3>The Numbers..</h3>
+            <table id="coins">
+              <tr>
+                <th>Date</th>
+                <th>Open (USD)</th>
+                <th>24HR High (USD)</th>
+                <th>24HR Low</th>
+                <th>Close (USD)</th>
+                <th>Volume</th>
+                <th>Trades</th>
+              </tr> 
+              {% for start_date, price_open, price_high, price_low, price_close, volume_traded, trades_count in coin_data %}
+              <tr>
+                <td>{{ start_date|date:"Y-M-d" }}</td>
+                <td>{{ price_open|floatformat:"2" }}</td>
+                <td>{{ price_high|floatformat:"2" }}</td>
+                <td>{{ price_low|floatformat:"2" }}</td>
+                <td>{{ price_close|floatformat:"2" }}</td>
+                <td>{{ volume_traded|floatformat:"0" }}</td>
+                <td>{{ trades_count|floatformat:"0" }}</td>
+              </tr>
+              {% endfor %}
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+  {% endblock %}
+</html>

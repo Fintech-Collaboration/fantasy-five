@@ -1,0 +1,94 @@
+{% extends './base.html' %}
+{% load static %}
+
+{% block content %}
+<head>
+  <title>Coin List</title>
+
+  <style>
+	.portfolio_card {
+		margin-top: auto;
+		margin-bottom: auto;
+		background: powderblue;
+		position: relative;
+		display: flex;
+		flex-direction: column;
+		padding: 10px;
+		box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+		-webkit-box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+		-moz-box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+		border-radius: 5px;
+	}
+	.form_container {
+		margin-top: 20px;
+	}
+	#form-title{
+		color: #fff;
+	}
+	.submit_btn {
+		width: 100%;
+		background: #33ccff !important;
+		color: white !important;
+	}
+	.submit_btn:focus {
+		box-shadow: none !important;
+		outline: 0px !important;
+	}
+	.submit_container {
+		padding: 0 2rem;
+	}
+	.input-group-text {
+		background: #f7ba5b !important;
+		color: white !important;
+		border: 0 !important;
+		border-radius: 0.25rem 0 0 0.25rem !important;
+	}
+	.input_user,
+	.input_pass:focus {
+		box-shadow: none !important;
+		outline: 0px !important;
+	}
+
+    #messages{
+        background-color: grey;
+        color: #fff;
+        padding: 10px;
+        margin-top: 10px;
+    }
+	</style>
+</head>
+
+<body>
+	<div class="container h-50">
+		<div class="d-flex justify-content-center h-100">
+		<div class="portfolio_card">
+			<table id="coin_table">
+			<tr>
+				<th> </th>
+				<th>Ticker</th>
+				<th>Name</th>
+				<th>Opening Price (USD)</th>
+				<th>24H High (USD)</th>
+				<th>24H Low (USD)</th>
+				<th>Closing Price (USD)</th>
+				<th>Volume</th>
+				<th>Trades</th>
+			</tr> 
+			{% for coin in coin_data|dictsort:"name" %}
+				<tr>
+					<td><a href="{% url 'transactioncreate' coin.ticker %}"><button>Buy</button></a></td>
+					<td><a href="{% url 'coinpage' coin.ticker %}">{{ coin.ticker }}</a></td>
+					<td>{{ coin.name }}</td>
+					<td>${{ coin.price_open }}</td>
+					<td>${{ coin.price_high }}</td>
+					<td>${{ coin.price_low }}</td>
+					<td>${{ coin.price_close }}</td>
+					<td>{{ coin.volume_traded }}</td>
+					<td>{{ coin.trades_count }}</td>
+				</tr>
+			{% endfor %}
+			</table>
+		</div>
+	</div>
+</body>
+{% endblock %}
