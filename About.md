@@ -2,16 +2,20 @@
 
 ## What is Fantasy Five
 
-#### Fantasy Five is, currently a prototype of, a sandbow that allows users to practice trading cryptocurrencies with no real financial risk. Fantasy Five allows users to access historical OHLCV data on several cryptocurrencies, view machine learning prediciton plots, as well as to create and view mock portfolios. 
+#### “Fantasy Five” is a software solution that provides a “sandbox virtual environment” where users can create mock portfolios to practice investing and trading cryptocurrencies. Users can also view historical OHLCV data and analysis based on various criteria for any of the selected twelve cryptocurrencies, four in each of the following categories:
 
-#### Fantasy Five currently has information and analysis on 12 cryptocurrencies, four in each of the following categories: High Cap(>$5b), Mid Cap(250m-4.99b), Low Cap (<250m) and utilizes the SVC and ADABoost classifiers for its machine learning models and predictions.  
+#####         1. High Cap (> $5 b)
+#####         2. Mid Cap ($251 m to $4.99 b)
+#####         3. Low Cap (< $ 250 m)
 
-#### Through the portfolio tab, users are able to create mock cryptocurrency wallets choosing how much they would like to invest, in which coins to invest in, and what allocation per selected coin.
-
+#### The analysis provides decision-making models with their related predicitons and are generated using Machine Learning and Time Series Forecasting methodologies. 
 
 ## Inspiration
 #### The inspiration behind Fantasy Five stems from the amount of attention currently being paid to the crypto space. Our team sought to create an environment where people interested in the crypto space, whether experienced or just starting out, can practice buying, selling, and navigating through the rapidly advancing industry. Users have the freedom to explore their crypto curiosity on Fantasy Five, then apply what they have learned to their real wallets and portfolios. 
 
+<img src="pictures/picture1.png" width="600" />
+
+<img src="pictures/picture2.png" width="600" />
 
 ## The Team:
 
