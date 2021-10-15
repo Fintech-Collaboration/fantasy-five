@@ -13,9 +13,9 @@
 ## Inspiration
 #### The inspiration behind Fantasy Five stems from the amount of attention currently being paid to the crypto space. Our team sought to create an environment where people interested in the crypto space, whether experienced or just starting out, can practice buying, selling, and navigating through the rapidly advancing industry. Users have the freedom to explore their crypto curiosity on Fantasy Five, then apply what they have learned to their real wallets and portfolios. 
 
-<img src="pictures/picture1.png" width="600" />
+<img src="pictures/Picture1.png" width="600" />
 
-<img src="pictures/picture2.png" width="600" />
+<img src="pictures/Picture2.png" width="600" />
 
 ## The Team:
 
