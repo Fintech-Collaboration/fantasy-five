@@ -1,5 +1,6 @@
 {% extends './base.html' %}
 {% load static %}
+{% load humanize %}
 
 {% block content %}
 <head>
@@ -61,33 +62,34 @@
 <body>
 	<div class="container h-50">
 		<div class="d-flex justify-content-center h-100">
-		<div class="portfolio_card">
-			<table id="coin_table">
-			<tr>
-				<th> </th>
-				<th>Ticker</th>
-				<th>Name</th>
-				<th>Opening Price (USD)</th>
-				<th>24H High (USD)</th>
-				<th>24H Low (USD)</th>
-				<th>Closing Price (USD)</th>
-				<th>Volume</th>
-				<th>Trades</th>
-			</tr> 
-			{% for coin in coin_data|dictsort:"name" %}
+			<div class="portfolio_card">
+				<table id="coin_table">
 				<tr>
-					<td><a href="{% url 'transactioncreate' coin.ticker %}"><button>Buy</button></a></td>
-					<td><a href="{% url 'coinpage' coin.ticker %}">{{ coin.ticker }}</a></td>
-					<td>{{ coin.name }}</td>
-					<td>${{ coin.price_open }}</td>
-					<td>${{ coin.price_high }}</td>
-					<td>${{ coin.price_low }}</td>
-					<td>${{ coin.price_close }}</td>
-					<td>{{ coin.volume_traded }}</td>
-					<td>{{ coin.trades_count }}</td>
-				</tr>
-			{% endfor %}
-			</table>
+					<th> </th>
+					<th>Ticker</th>
+					<th>Name</th>
+					<th>Opening Price (USD)</th>
+					<th>24H High (USD)</th>
+					<th>24H Low (USD)</th>
+					<th>Closing Price (USD)</th>
+					<th>Volume</th>
+					<th>Trades</th>
+				</tr> 
+				{% for coin in coin_data|dictsort:"name" %}
+					<tr>
+						<td><a href="{% url 'transactioncreate' coin.ticker %}"><button>Buy</button></a></td>
+						<td><a href="{% url 'coinpage' coin.ticker %}">{{ coin.ticker }}</a></td>
+						<td>{{ coin.name }}</td>
+						<td>${{ coin.price_open|intcomma }}</td>
+						<td>${{ coin.price_high|intcomma }}</td>
+						<td>${{ coin.price_low|intcomma }}</td>
+						<td>${{ coin.price_close|intcomma }}</td>
+						<td>{{ coin.volume_traded|intcomma }}</td>
+						<td>{{ coin.trades_count|intcomma }}</td>
+					</tr>
+				{% endfor %}
+				</table>
+			</div>
 		</div>
 	</div>
 </body>

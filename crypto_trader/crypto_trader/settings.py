@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django_userforeignkey',
     'multiselectfield',
     'polymorphic',
+    'django.contrib.humanize',
 ]
 
 MIDDLEWARE = [

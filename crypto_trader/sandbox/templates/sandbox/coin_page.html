@@ -1,5 +1,6 @@
 {% extends './coinbase.html' %}
 {% load static %}
+{% load humanize %}
 
 <DOCTYPE html>
 <html lang="en">  
@@ -76,7 +77,7 @@
           </div><br><br>
 
           <div class="coin_algo_card_sub">
-            <h3>Machine Learning Strategy Models<br>Classifier</h3>
+            <h3>Machine Learning Strategy Models<br>Support Vector Classifier</h3>
             <div class="portfolio_card">
               {% autoescape off %}
               <div class="plot_div">{{ ml_svc_plot }}</div>
@@ -109,12 +110,12 @@
               {% for start_date, price_open, price_high, price_low, price_close, volume_traded, trades_count in coin_data %}
               <tr>
                 <td style="width: 180px">{{ start_date|date:"Y-M-d" }}</td>
-                <td style="width: 90px">{{ price_open|floatformat:"2" }}</td>
-                <td style="width: 90px">{{ price_high|floatformat:"2" }}</td>
-                <td style="width: 90px">{{ price_low|floatformat:"2" }}</td>
-                <td style="width: 90px">{{ price_close|floatformat:"2" }}</td>
-                <td style="width: 110px">{{ volume_traded|floatformat:"0" }}</td>
-                <td style="width: 110px">{{ trades_count|floatformat:"0" }}</td>
+                <td style="width: 90px">${{ price_open|floatformat:"2"|intcomma }}</td>
+                <td style="width: 90px">${{ price_high|floatformat:"2"|intcomma }}</td>
+                <td style="width: 90px">${{ price_low|floatformat:"2"|intcomma }}</td>
+                <td style="width: 90px">${{ price_close|floatformat:"2"|intcomma }}</td>
+                <td style="width: 110px">{{ volume_traded|floatformat:"0"|intcomma }}</td>
+                <td style="width: 110px">{{ trades_count|floatformat:"0"|intcomma }}</td>
               </tr>
               {% endfor %}
             </table>

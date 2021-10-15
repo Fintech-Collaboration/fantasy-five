@@ -354,6 +354,7 @@ def ml_cap_plotter(model_func, name: str, ticker: str):
 
 def ml_coin_plotter(model_func, name: str, ticker: str):
     name = "".join(name.split(" "))
+    print(f"{name} -- {ticker}")
 
     pred_df = model_func(
         model=model_func.__str__(),

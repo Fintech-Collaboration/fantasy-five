@@ -9,8 +9,9 @@ import holoviews as hv
 from fbprophet  import Prophet
 from pathlib    import Path
 
-from sklearn.preprocessing import StandardScaler
-from sklearn.metrics       import classification_report
+from pandas.tseries.offsets import DateOffset
+from sklearn.preprocessing  import StandardScaler
+from sklearn.metrics        import classification_report
 
 hv.extension('bokeh')
 
@@ -167,7 +168,7 @@ def ohlc_forecast(name="Bitcoin", ticker="BTC", col="price_close"):
 @set__str__("svc")
 def ml_svc_apply(model: str, name: str, ticker: str, market_cap="midcap"):
     data_path  = DATA_PATH(name)
-    model_path = f"{BASE_DIR}/ml_resources/{ticker.lower()}_{model.lower()}_model.pkl"
+    model_path = f"{BASE_DIR}/ml_resources/model_{market_cap.lower()}_svc.pkl"
     
     forecast = pd.read_pickle(model_path)
     ohlcv_df = pd.read_csv(
@@ -175,7 +176,7 @@ def ml_svc_apply(model: str, name: str, ticker: str, market_cap="midcap"):
         index_col=f"{ticker.lower()}_start_date",
         infer_datetime_format=True,
         parse_dates=True,
-    )
+    ).sort_index().drop_duplicates()
 
     # Filter the date index and close columns
     signals_df = ohlcv_df.loc[:, ["price_close"]]
@@ -248,13 +249,13 @@ def ml_adaboost_apply(model: str, name: str, ticker: str):
     data_path  = DATA_PATH(name)
     model_path = f"{BASE_DIR}/ml_resources/{ticker.lower()}_{model.lower()}_model.pkl"
     
-    forecast = pd.read_pickle(model_path)
-    ohlcv_df = pd.read_csv(
+    svm_model = pd.read_pickle(model_path)
+    ohlcv_df  = pd.read_csv(
         data_path,
         index_col=f"{ticker.lower()}_start_date",
         infer_datetime_format=True,
         parse_dates=True,
-    )
+    ).sort_index().drop_duplicates()
 
     # Filter the date index and close columns
     signals_df = ohlcv_df.loc[:, ["price_close"]]
@@ -267,7 +268,117 @@ def ml_adaboost_apply(model: str, name: str, ticker: str):
 
     # Set the short window and long window
     short_window = 4
-    long_window  = 100
+    long_window = 100
+
+    # Generate the fast and slow simple moving averages (4 and 100 days, respectively)
+    signals_df['SMA_Fast'] = signals_df['price_close'].rolling(window=short_window).mean()
+    signals_df['SMA_Slow'] = signals_df['price_close'].rolling(window=long_window).mean()
+
+    signals_df = signals_df.dropna()
+
+    # Initialize the new Signal column
+    signals_df['Signal'] = 0.0
+
+    # When Actual Returns are greater than or equal to 0, generate signal to buy stock long
+    signals_df.loc[(signals_df['Actual Returns'] >= 0), 'Signal'] = 1
+
+    # When Actual Returns are less than 0, generate signal to sell stock short
+    signals_df.loc[(signals_df['Actual Returns'] < 0), 'Signal'] = -1
+
+    # Calculate the strategy returns and add them to the signals_df DataFrame
+    signals_df['Strategy Returns'] = signals_df['Actual Returns'] * signals_df['Signal'].shift()
+
+    # Assign a copy of the sma_fast and sma_slow columns to a features DataFrame called X
+    X = signals_df[['SMA_Fast', 'SMA_Slow']].shift().dropna()
+
+    # Create the target set selecting the Signal column and assiging it to y
+    y = signals_df['Signal']
+
+    # Select the start of the training period
+    training_begin = X.index.min()
+
+    # Select the ending period for the training data with an offset of 3 months
+    training_end = X.index.min() + DateOffset(months=3)
+
+    # Generate the X_train and y_train DataFrames
+    X_train = X.loc[training_begin:training_end]
+    y_train = y.loc[training_begin:training_end]
+
+    # Generate the X_test and y_test DataFrames
+    X_test = X.loc[training_end+DateOffset(days=1):]
+    y_test = y.loc[training_end+DateOffset(days=1):]
+
+    # Scale the features DataFrames
+
+    # Create a StandardScaler instance
+    scaler = StandardScaler()
+
+    # Apply the scaler model to fit the X-train data
+    X_scaler = scaler.fit(X_train)
+
+    # Transform the X_train and X_test DataFrames using the X_scaler
+    X_train_scaled = X_scaler.transform(X_train)
+    X_test_scaled = X_scaler.transform(X_test)
+
+    # Use the testing data to make the model predictions
+    svm_pred = svm_model.predict(X_test_scaled)
+
+    # Review the model's predicted values
+    svm_pred_df = pd.DataFrame(svm_pred)
+    svm_pred_df.index = y_test.index
+    svm_pred_df.columns = ['Predicted']
+    svm_pred_df
+
+    # Use a classification report to evaluate the model using the predictions and testing data
+    svm_testing_report = classification_report(y_test, svm_pred)
+
+    # Print the classification report
+    print(svm_testing_report)
+
+    # Create a predictions DataFrame
+    predictions_df = pd.DataFrame(index=X_test.index)
+
+    # Add the SVM model predictions to the DataFrame
+    predictions_df['Predicted'] = svm_pred
+
+    # Add the actual returns to the DataFrame
+    predictions_df = pd.concat(
+        [predictions_df, signals_df[['Actual Returns']]],
+        axis=1,
+        join="inner",
+    )
+
+    # Add the strategy returns to the DataFrame
+    predictions_df['Strategy Returns'] = predictions_df['Actual Returns'] * predictions_df['Predicted']
+
+    return predictions_df
+
+
+@set__str__("adaboost0")
+def ml_adaboost_apply0(model: str, name: str, ticker: str):
+    data_path  = DATA_PATH(name)
+    model_path = f"{BASE_DIR}/ml_resources/{ticker.lower()}_{model.lower()}_model.pkl"
+    
+    forecast = pd.read_pickle(model_path)
+    ohlcv_df = pd.read_csv(
+        data_path,
+        index_col=f"{ticker.lower()}_start_date",
+        infer_datetime_format=True,
+        parse_dates=True,
+    ).sort_index().drop_duplicates()
+
+    # Filter the date index and close columns
+    signals_df = ohlcv_df.loc[:, ["price_close"]]
+
+    # Use the pct_change function to generate  returns from close prices
+    signals_df["Actual Returns"] = signals_df["price_close"].pct_change()
+
+    # Drop all NaN values from the DataFrame
+    signals_df = signals_df.dropna()
+
+    # Set the short window and long window
+    short_window = 4
+    long_window = 100
 
     # Generate the fast and slow simple moving averages (4 and 100 days, respectively)
     signals_df['SMA_Fast'] = signals_df['price_close'].rolling(window=short_window).mean()
@@ -291,30 +402,52 @@ def ml_adaboost_apply(model: str, name: str, ticker: str):
     X = signals_df[['SMA_Fast', 'SMA_Slow']].shift().dropna()
     y = signals_df['Signal']
 
+    # Select the start of the training period
+    training_begin = X.index.min()
+
+    # Select the ending period for the training data with an offset of 3 months
+    training_end = X.index.min() + DateOffset(months=3)
+
+    # Generate the X_train and y_train DataFrames
+    X_train = X.loc[training_begin:training_end]
+    y_train = y.loc[training_begin:training_end]
+
+    # Generate the X_test and y_test DataFrames
+    X_test = X.loc[training_end+DateOffset(days=1):]
+    y_test = y.loc[training_end+DateOffset(days=1):]
+
+    # Create a StandardScaler instance
     scaler = StandardScaler()
 
+    # Apply the scaler model to fit the X-train data
     X_scaler = scaler.fit(X)
-    X_scaled = X_scaler.transform(X)
 
-    pred    = forecast.predict(X_scaled)
+    # Transform the X_train and X_test DataFrames using the X_scaler
+    X_test_scaled = X_scaler.transform(X_test)
+
+    pred    = forecast.predict(X_test_scaled)
     pred_df = pd.DataFrame(pred)
-    pred_df.index   = y.index[1:]
+    pred_df.index   = y_test.index
     pred_df.columns = ["Predicted"]
 
     # Use a classification report to evaluate the model using the predictions and testing data
-    svm_testing_report = classification_report(y[1:], pred)
+    svm_testing_report = classification_report(y_test, pred)
 
     # Print the classification report
     print(svm_testing_report)
 
     # Create a predictions DataFrame
-    predictions_df = pd.DataFrame(index=X.index)
-
+    predictions_df = pd.DataFrame(index=X_test.index)
+    
     # Add the SVM model predictions to the DataFrame
     predictions_df['Predicted'] = pred
 
-    # Add the actual returns to the DataFrame
-    predictions_df['Actual Returns'] = signals_df['Actual Returns'][1:]
+    # Add the SVM model predictions to the DataFrame
+    predictions_df = pd.concat(
+        [predictions_df, signals_df[['Actual Returns']]],
+        axis=1,
+        join="inner",
+    )
 
     # Add the strategy returns to the DataFrame
     predictions_df['Strategy Returns'] = predictions_df['Actual Returns'] * predictions_df['Predicted']
