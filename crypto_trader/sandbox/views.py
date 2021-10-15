@@ -1,8 +1,13 @@
+from logging import makeLogRecord
+import os
+from pickle import MARK
+
 import numpy as np
 
 from datetime          import datetime
 from plotly.offline    import plot
 from plotly.graph_objs import Scatter
+from pathlib           import Path
 
 from django.urls                    import reverse_lazy
 from django.shortcuts               import render, redirect
@@ -17,7 +22,13 @@ from django.http                    import Http404
 from django.db.models               import Q
 
 from .utils.coin          import icon_path, get_coin_data
-from .utils.algo_trading  import dmac, ohlc_forecast
+
+from .utils.algo_trading  import (
+    dmac,
+    ohlc_forecast,
+    ml_classifier_apply,
+    ml_booster_apply
+)
 
 from .models import (
     Portfolio,
@@ -99,7 +110,7 @@ def home(request):
     return render(request, "sandbox/home.html", context)
 
 
-def line_plotter(name, ticker):
+def line_plotter(name: str, ticker: str):
     name  = "".join(name.split(" "))
     short = 50
     long  = 100
@@ -211,13 +222,13 @@ def line_plotter(name, ticker):
 
     plt = plot(
         [trace_data, trace_short, trace_long, trace_entry, trace_exit],
-        output_type='div',
+        output_type="div",
     )
 
     return plt
 
 
-def forecast_plotter(name, ticker, col):
+def forecast_plotter(name: str, ticker: str, col: str):
     name  = "".join(name.split(" "))
     df_forecast, df = ohlc_forecast(name, ticker, col)
 
@@ -286,7 +297,56 @@ def forecast_plotter(name, ticker, col):
 
     plt = plot(
         [trace_lower_band, trace_upper_band, trace_y, trace_yhat],
-        output_type='div',
+        output_type="div",
+    )
+
+    return plt
+
+
+def ml_plotter(model_func, name: str, ticker: str):
+    name       = "".join(name.split(" "))
+    market_cap = {
+        "lowcap":  {"type": "Low-Cap",  "color": "red"},
+        "midcap":  {"type": "Mid-Cap",  "color": "orange"},
+        "highcap": {"type": "High-Cap", "color": "blue"},
+    }
+
+    pred_df = {}
+    traces  = []
+    for key, val in market_cap.items():
+        pred_df[key] = model_func(
+            model=model_func.__str__(),
+            name=name,
+            ticker=ticker,
+            market_cap="".join(val["type"].split("-"))
+        )
+
+        # Plot the actual returns versus the strategy returns
+        x_data_cum_prod          = pred_df[key].index
+        y_data_cum_prod_actual   = (1 + pred_df[key]['Actual Returns'  ]).cumprod() - 1
+        y_data_cum_prod_strategy = (1 + pred_df[key]['Strategy Returns']).cumprod() - 1
+
+        traces.append(Scatter(
+            x=x_data_cum_prod,
+            y=y_data_cum_prod_strategy,
+            name=f"Strategy Returns<br>{val['type']}",
+            mode="lines",
+            marker_color=val["color"],
+            legendrank=1,
+        ))
+
+    traces.append(Scatter(
+        x=x_data_cum_prod,
+        y=y_data_cum_prod_actual,
+        name="Actual Returns",
+        mode="lines",
+        marker_color="green",
+        legendrank=0,
+    ))
+
+    plt = plot(
+        traces,
+        output_type="div",
     )
 
     return plt
@@ -317,7 +377,7 @@ def coin_table(request):
     return render(request, "sandbox/coin_list.html", context)
 
 
-def coin_page(request, ticker):
+def coin_page(request, ticker: str):
     try:
         coin = next(filter(lambda m: m.__ticker__.lower() == ticker.lower(), COIN_MODELS))
     except Coin.DoesNotExist:
@@ -327,7 +387,9 @@ def coin_page(request, ticker):
 
     name = coin.objects.last().name.capitalize()
     coin_plot     = line_plotter(name, ticker)
-    forecast_plot = forecast_plotter(name, ticker, "price_close")
+    # forecast_plot = forecast_plotter(name, ticker, "price_close")
+    ml_svc_plot   = ml_plotter(ml_classifier_apply, name, ticker)
+    ml_boost_plot = ml_plotter(ml_booster_apply, name, ticker)
 
     context = dict(        
         ticker    = ticker,
@@ -343,14 +405,16 @@ def coin_page(request, ticker):
             pull_func("trades_count")),
             coin_icon = icon_path(coin.__ticker__),
         coin_plot     = coin_plot,
-        forecast_plot = forecast_plot,
+        # forecast_plot = forecast_plot,
+        ml_svc_plot   = ml_svc_plot,
+        ml_boost_plot = ml_boost_plot,
     )
 
     return render(request, f"sandbox/coin_page.html", context)
 
 
 @login_required(login_url="login")
-def transaction_create_view(request, ticker):
+def transaction_create_view(request, ticker: str):
     form = TransactionCreateForm(request.POST or None)
     if form.is_valid():
         form.save()
@@ -381,7 +445,7 @@ def transaction_create_view(request, ticker):
 
 
 @login_required(login_url="login")
-def transaction_execute(request, ticker):
+def transaction_execute(request, ticker: str):
     if request.method == "POST":
         portfolio_nickname = request.POST["portfolio-buy-select"]
         coin_count         = float(request.POST["coin-buy-input"])

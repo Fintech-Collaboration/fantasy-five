@@ -1,19 +1,30 @@
 # import pickle
+# import pandas as pd
 
-# pkl_file = r"C:\Users\JasonGarcia24\FINTECH\workspace\fantasy-five\crypto_trader\sandbox\data\aave_model.pkl"
+# from sklearn.preprocessing import StandardScaler
+# from sklearn.metrics       import classification_report
 
-# with open(pkl_file, 'rb') as f:
-#     data = pickle.load(f)
+
+# from crypto_trader.sandbox.utils.algo_trading import ohlc_forecast, ml_apply
+
+# pickle_path = r"C:\Users\JasonGarcia24\FINTECH\workspace\fantasy-five\crypto_trader\sandbox\data\aave_model.pkl"
+# data_path   = r"C:\Users\JasonGarcia24\FINTECH\workspace\fantasy-five\crypto_trader\sandbox\data\aave_5_year.csv"
+
+# forecast = ml_apply("", "bitcoin", "btc")
+
+
 
 # breakpoint()
 
-# gh = 1
+# sl = 1
 
-import pickle
-from crypto_trader.sandbox.utils.algo_trading import ohlc_forecast, ml_apply
 
-pickle_path = r"C:\Users\JasonGarcia24\FINTECH\workspace\fantasy-five\crypto_trader\sandbox\data\aave_model.pkl"
-forecast_df = ml_apply(pickle_path)
+def apples():
+    def __str__():
+        return "In __str__"
 
-breakpoint()
-sl = 1
+    gh = 1
+
+
+if __name__ == "__main__":
+    print(apples.__str__())

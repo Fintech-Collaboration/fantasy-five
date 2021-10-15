@@ -37,6 +37,10 @@
 			.coin_table_card_sub {
 				width: 750px;
 			}
+      .plot_div {
+        width: 100%;
+        border-radius: 5px;
+      }
     </style>
   </head>
 
@@ -62,20 +66,29 @@
           </div><br>
 
           <div class="coin_algo_card_sub">
-            <h3>Smooth Moving Average</h3>
+            <h3>Dual Moving Average Crossover (DMAC)</h3>
             {% block body %}
             <div class="portfolio_card">
               {% autoescape off %}
-              <div class="plot-div">{{ coin_plot }}</div>
+              <div class="plot_div">{{ coin_plot }}</div>
               {% endautoescape %}
             </div><br><br>
           </div><br><br>
 
           <div class="coin_algo_card_sub">
-            <h3>Timeseries Forecasting</h3>
+            <h3>Machine Learning Strategy Models<br>Classifier</h3>
             <div class="portfolio_card">
               {% autoescape off %}
-              <div class="plot-div">{{ forecast_plot }}</div>
+              <div class="plot_div">{{ ml_svc_plot }}</div>
+              {% endautoescape %}
+            </div><br><br>
+          </div><br><br>
+
+          <div class="coin_algo_card_sub">
+            <h3>Machine Learning Strategy Models<br>AdaBoost Classifier with Gaussian Naive Bayes</h3>
+            <div class="portfolio_card">
+              {% autoescape off %}
+              <div class="plot_div">{{ ml_boost_plot }}</div>
               {% endautoescape %}
             </div><br><br>
           </div><br><br>
@@ -86,22 +99,22 @@
             <table id="coins">
               <tr>
                 <th>Date</th>
-                <th>Open (USD)</th>
-                <th>24HR High (USD)</th>
-                <th>24HR Low</th>
-                <th>Close (USD)</th>
+                <th>Open<br>(USD)</th>
+                <th>24HR High<br>(USD)</th>
+                <th>24HR Low<br>(USD)</th>
+                <th>Close<br>(USD)</th>
                 <th>Volume</th>
                 <th>Trades</th>
               </tr> 
               {% for start_date, price_open, price_high, price_low, price_close, volume_traded, trades_count in coin_data %}
               <tr>
-                <td>{{ start_date|date:"Y-M-d" }}</td>
-                <td>{{ price_open|floatformat:"2" }}</td>
-                <td>{{ price_high|floatformat:"2" }}</td>
-                <td>{{ price_low|floatformat:"2" }}</td>
-                <td>{{ price_close|floatformat:"2" }}</td>
-                <td>{{ volume_traded|floatformat:"0" }}</td>
-                <td>{{ trades_count|floatformat:"0" }}</td>
+                <td style="width: 180px">{{ start_date|date:"Y-M-d" }}</td>
+                <td style="width: 90px">{{ price_open|floatformat:"2" }}</td>
+                <td style="width: 90px">{{ price_high|floatformat:"2" }}</td>
+                <td style="width: 90px">{{ price_low|floatformat:"2" }}</td>
+                <td style="width: 90px">{{ price_close|floatformat:"2" }}</td>
+                <td style="width: 110px">{{ volume_traded|floatformat:"0" }}</td>
+                <td style="width: 110px">{{ trades_count|floatformat:"0" }}</td>
               </tr>
               {% endfor %}
             </table>

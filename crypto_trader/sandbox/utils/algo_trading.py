@@ -1,20 +1,37 @@
 import pickle
 import hvplot.pandas
+import functools
 
 import pandas    as pd
 import numpy     as np
 import holoviews as hv
 
-import matplotlib.pyplot as plt
-import plotly.graph_objs as go
-import plotly.offline    as py
+from fbprophet  import Prophet
+from pathlib    import Path
 
-from plotly.offline import init_notebook_mode
-from fbprophet      import Prophet
-from pathlib        import Path
-from bokeh.embed    import components
+from sklearn.preprocessing import StandardScaler
+from sklearn.metrics       import classification_report
 
 hv.extension('bokeh')
+
+
+BASE_DIR  = Path(__file__).resolve().parent.parent
+DATA_PATH = lambda n: f"{BASE_DIR}/data/{n.lower()}_5_year.csv"
+
+
+def set__str__ (_str):
+    def wrapper (f):
+        class FuncType:
+            def __call__ (self, *args, **kwargs):
+                # call the original function
+                return f(*args, **kwargs)
+            def __str__ (self):
+                # call the custom __str__ function
+                return _str
+
+        # decorate with functool.wraps to make the resulting function appear like f
+        return functools.wraps(f)(FuncType())
+    return wrapper
 
 
 def dmac(df, short=50, long=100):
@@ -45,8 +62,6 @@ def ohlc_forecast(name="Bitcoin", ticker="BTC", col="price_close"):
     ## Install and import the required libraries and dependencies
     """
 
-    BASE_DIR = Path(__file__).resolve().parent.parent
-
     TITLE_DICT = {
         "price_close": "Market Open",
         "price_high":  "Daily High",
@@ -58,7 +73,7 @@ def ohlc_forecast(name="Bitcoin", ticker="BTC", col="price_close"):
     ticker = ticker.lower()
 
     # Variables
-    filename         = f"{BASE_DIR}/data/{name}_5_year.csv"
+    data_path        = DATA_PATH(name)
     forecast_period  = 90
     index_column     = ticker + "_start_date"
     x_val            = ticker + "_start_date.year"
@@ -67,7 +82,7 @@ def ohlc_forecast(name="Bitcoin", ticker="BTC", col="price_close"):
 
     # Set the "Date" column as the Datetime Index.
     df_crypto = pd.read_csv(
-    filename, 
+    data_path, 
     index_col=index_column, 
     parse_dates = True, 
     infer_datetime_format = True
@@ -149,13 +164,160 @@ def ohlc_forecast(name="Bitcoin", ticker="BTC", col="price_close"):
     return forecast_crypto, df_crypto_noindex_prophet
 
 
-def ml_apply(pickled_model: str):
-    with open(pickled_model, 'rb') as f:
-        forecast = pickle.load(f)
+@set__str__("svc")
+def ml_svc_apply(model: str, name: str, ticker: str, market_cap="midcap"):
+    data_path  = DATA_PATH(name)
+    model_path = f"{BASE_DIR}/models/{ticker.lower()}_{model.lower()}_model.pkl"
+    
+    forecast = pd.read_pickle(model_path)
+    ohlcv_df = pd.read_csv(
+        data_path,
+        index_col=f"{ticker.lower()}_start_date",
+        infer_datetime_format=True,
+        parse_dates=True,
+    )
 
-    breakpoint()
+    # Filter the date index and close columns
+    signals_df = ohlcv_df.loc[:, ["price_close"]]
 
-    gh = 1
+    # Use the pct_change function to generate  returns from close prices
+    signals_df["Actual Returns"] = signals_df["price_close"].pct_change()
 
-    return forecast
+    # Drop all NaN values from the DataFrame
+    signals_df = signals_df.dropna()
+
+    # Set the short window and long window
+    short_window = 4
+    long_window  = 100
+
+    # Generate the fast and slow simple moving averages (4 and 100 days, respectively)
+    signals_df['SMA_Fast'] = signals_df['price_close'].rolling(window=short_window).mean()
+    signals_df['SMA_Slow'] = signals_df['price_close'].rolling(window=long_window).mean()
+
+    signals_df = signals_df.dropna()
+
+    # Initialize the new Signal column
+    signals_df['Signal'] = 0.0
+
+    # When Actual Returns are greater than or equal to 0, generate signal to buy stock long
+    signals_df.loc[(signals_df['Actual Returns'] >= 0), 'Signal'] = 1
+
+    # When Actual Returns are less than 0, generate signal to sell stock short
+    signals_df.loc[(signals_df['Actual Returns'] < 0), 'Signal'] = -1
+
+    # Calculate the strategy returns and add them to the signals_df DataFrame
+    signals_df['Strategy Returns'] = signals_df['Actual Returns'] * signals_df['Signal'].shift()
+
+    # Assign a copy of the sma_fast and sma_slow columns to a features DataFrame called X
+    X = signals_df[['SMA_Fast', 'SMA_Slow']].shift().dropna()
+    y = signals_df['Signal']
+
+    scaler = StandardScaler()
+
+    X_scaler = scaler.fit(X)
+    X_scaled = X_scaler.transform(X)
+
+    pred    = forecast.predict(X_scaled)
+    pred_df = pd.DataFrame(pred)
+    pred_df.index   = y.index[1:]
+    pred_df.columns = ["Predicted"]
+
+    # Use a classification report to evaluate the model using the predictions and testing data
+    svm_testing_report = classification_report(y[1:], pred)
+
+    # Print the classification report
+    print(svm_testing_report)
+
+    # Create a predictions DataFrame
+    predictions_df = pd.DataFrame(index=X.index)
+
+    # Add the SVM model predictions to the DataFrame
+    predictions_df['Predicted'] = pred
+
+    # Add the actual returns to the DataFrame
+    predictions_df['Actual Returns'] = signals_df['Actual Returns'][1:]
+
+    # Add the strategy returns to the DataFrame
+    predictions_df['Strategy Returns'] = predictions_df['Actual Returns'] * predictions_df['Predicted']
+
+    return predictions_df
+
+
+@set__str__("adaboost")
+def ml_adaboost_apply(model: str, name: str, ticker: str, market_cap="midcap"):
+    data_path  = DATA_PATH(name)
+    model_path = f"{BASE_DIR}/models/{ticker.lower()}_{model.lower()}_model.pkl"
+    
+    forecast = pd.read_pickle(model_path)
+    ohlcv_df = pd.read_csv(
+        data_path,
+        index_col=f"{ticker.lower()}_start_date",
+        infer_datetime_format=True,
+        parse_dates=True,
+    )
+
+    # Filter the date index and close columns
+    signals_df = ohlcv_df.loc[:, ["price_close"]]
+
+    # Use the pct_change function to generate  returns from close prices
+    signals_df["Actual Returns"] = signals_df["price_close"].pct_change()
+
+    # Drop all NaN values from the DataFrame
+    signals_df = signals_df.dropna()
+
+    # Set the short window and long window
+    short_window = 4
+    long_window  = 100
+
+    # Generate the fast and slow simple moving averages (4 and 100 days, respectively)
+    signals_df['SMA_Fast'] = signals_df['price_close'].rolling(window=short_window).mean()
+    signals_df['SMA_Slow'] = signals_df['price_close'].rolling(window=long_window).mean()
+
+    signals_df = signals_df.dropna()
+
+    # Initialize the new Signal column
+    signals_df['Signal'] = 0.0
+
+    # When Actual Returns are greater than or equal to 0, generate signal to buy stock long
+    signals_df.loc[(signals_df['Actual Returns'] >= 0), 'Signal'] = 1
+
+    # When Actual Returns are less than 0, generate signal to sell stock short
+    signals_df.loc[(signals_df['Actual Returns'] < 0), 'Signal'] = -1
+
+    # Calculate the strategy returns and add them to the signals_df DataFrame
+    signals_df['Strategy Returns'] = signals_df['Actual Returns'] * signals_df['Signal'].shift()
+
+    # Assign a copy of the sma_fast and sma_slow columns to a features DataFrame called X
+    X = signals_df[['SMA_Fast', 'SMA_Slow']].shift().dropna()
+    y = signals_df['Signal']
+
+    scaler = StandardScaler()
+
+    X_scaler = scaler.fit(X)
+    X_scaled = X_scaler.transform(X)
+
+    pred    = forecast.predict(X_scaled)
+    pred_df = pd.DataFrame(pred)
+    pred_df.index   = y.index[1:]
+    pred_df.columns = ["Predicted"]
+
+    # Use a classification report to evaluate the model using the predictions and testing data
+    svm_testing_report = classification_report(y[1:], pred)
+
+    # Print the classification report
+    print(svm_testing_report)
+
+    # Create a predictions DataFrame
+    predictions_df = pd.DataFrame(index=X.index)
+
+    # Add the SVM model predictions to the DataFrame
+    predictions_df['Predicted'] = pred
+
+    # Add the actual returns to the DataFrame
+    predictions_df['Actual Returns'] = signals_df['Actual Returns'][1:]
+
+    # Add the strategy returns to the DataFrame
+    predictions_df['Strategy Returns'] = predictions_df['Actual Returns'] * predictions_df['Predicted']
+
+    return predictions_df
 
