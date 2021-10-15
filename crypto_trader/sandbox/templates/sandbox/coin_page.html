@@ -24,11 +24,18 @@
         -moz-box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
         border-radius: 5px;
       }
+			.coin_algo_card_sub,
+      .coin_table_card_sub {
+				padding-bottom: 5px;
+        margin-bottom: 5px;
+				background: lightpink;
+        border-radius: 5px;
+			}
+			.coin_algo_card_sub {
+				width: 1200px;
+			}
 			.coin_table_card_sub {
 				width: 750px;
-        padding-top: 20px;
-				padding-bottom: 20px;
-				background: lightpink;
 			}
     </style>
   </head>
@@ -54,13 +61,25 @@
             <a href="{% url 'transactioncreate' ticker %}"><button>Buy</button></a>
           </div><br>
 
-          <div class="portfolio_card">
-            {% autoescape off %}
+          <div class="coin_algo_card_sub">
+            <h3>Smooth Moving Average</h3>
             {% block body %}
-            <div class="plot-div">{{ coin_plot }}</div>
-            {% endblock %}
-            {% endautoescape %}
+            <div class="portfolio_card">
+              {% autoescape off %}
+              <div class="plot-div">{{ coin_plot }}</div>
+              {% endautoescape %}
+            </div><br><br>
           </div><br><br>
+
+          <div class="coin_algo_card_sub">
+            <h3>Timeseries Forecasting</h3>
+            <div class="portfolio_card">
+              {% autoescape off %}
+              <div class="plot-div">{{ forecast_plot }}</div>
+              {% endautoescape %}
+            </div><br><br>
+          </div><br><br>
+          {% endblock %}
 
           <div class="coin_table_card_sub">
             <h3>The Numbers..</h3>

@@ -9,9 +9,11 @@
 
 # gh = 1
 
-from crypto_trader.sandbox.utils.ohlc_forecast import crypto_forecast
+import pickle
+from crypto_trader.sandbox.utils.algo_trading import ohlc_forecast, ml_apply
 
-plt = crypto_forecast("price_close", "Bitcoin", "BTC")
+pickle_path = r"C:\Users\JasonGarcia24\FINTECH\workspace\fantasy-five\crypto_trader\sandbox\data\aave_model.pkl"
+forecast_df = ml_apply(pickle_path)
 
 breakpoint()
 sl = 1

@@ -1,12 +1,8 @@
-import pickle
-
-import pandas as pd
-import numpy  as np
-import plotly.graph_objects as go
+import numpy as np
 
 from datetime          import datetime
 from plotly.offline    import plot
-from plotly.graph_objs import Scatter, Layout
+from plotly.graph_objs import Scatter
 
 from django.urls                    import reverse_lazy
 from django.shortcuts               import render, redirect
@@ -17,11 +13,11 @@ from django.contrib.auth            import logout, login
 from django.views.generic           import ListView
 from django.views.generic.edit      import CreateView, DeleteView, UpdateView
 from django.contrib                 import messages
-from django.http                    import Http404, HttpResponse
+from django.http                    import Http404
 from django.db.models               import Q
 
-from .utils.coin         import icon_path, get_coin_data
-from .utils.ohlc_forecast import crypto_forecast
+from .utils.coin          import icon_path, get_coin_data
+from .utils.algo_trading  import dmac, ohlc_forecast
 
 from .models import (
     Portfolio,
@@ -103,7 +99,7 @@ def home(request):
     return render(request, "sandbox/home.html", context)
 
 
-def line_plot(name, ticker):
+def line_plotter(name, ticker):
     name  = "".join(name.split(" "))
     short = 50
     long  = 100
@@ -131,19 +127,14 @@ def line_plot(name, ticker):
 
     hovertemplate = """
     <b>%{x}<br>
-    Daily Close:  $%{y:,12.2g}</b><br><br>
-    Daily Open:   $%{customdata[0]:,12.2g}<br>
-    Daily High:   $%{customdata[1]:,12.2g}<br>
-    Daily Low:    $%{customdata[2]:,12.2g}<br>
+    Daily Close:  $%{y:,6.2g}</b><br><br>
+    Daily Open:   $%{customdata[0]:,6.2g}<br>
+    Daily High:   $%{customdata[1]:,6.2g}<br>
+    Daily Low:    $%{customdata[2]:,6.2g}<br>
     Daily Volume:  %{customdata[3]:,.0f}<br>
     Trade Count:   %{customdata[4]:,.0f}
     <extra></extra>
     """
-    layout = go.Layout(
-        title = "Sine and cos",
-        xaxis = {'title':'angle'},
-        yaxis = {'title':'value'}
-    )
 
     trace_data = Scatter(
         x=x_data,
@@ -226,19 +217,79 @@ def line_plot(name, ticker):
     return plt
 
 
-def dmac(df, short=50, long=100):
-    df["SMA_short"] = df["price_close"].rolling(window=short).mean()
-    df["SMA_long"]  = df["price_close"].rolling(window=long ).mean()
-    df["signal"]    = 0.0
+def forecast_plotter(name, ticker, col):
+    name  = "".join(name.split(" "))
+    df_forecast, df = ohlc_forecast(name, ticker, col)
 
-    df["signal"][short:] = np.where(
-        df["SMA_short"][short:] > df["SMA_long"][short:], 1.0, 0.0
+    trace_name = " ".join([s.capitalize() for s in f"{col}".split("_")])
+
+    x_data            = df_forecast["ds"]
+    y_data_y          = df["y"]
+    y_data_yhat       = df_forecast["yhat"]
+    y_data_upper_band = df_forecast['yhat_upper']
+    y_data_lower_band = df_forecast['yhat_lower']
+
+
+    trace_y = Scatter(
+        x=x_data,
+        y=y_data_y,
+        mode='markers',
+        name=trace_name,
+        marker_color='#FFBAD2',
+        marker=dict(
+            line=dict(width=1)
+        ),
+        legendrank=1,
     )
 
-    df["entry_exit"] = df["signal"].diff()
+    trace_yhat = Scatter(
+    x=x_data,
+    y=y_data_yhat,
+    mode='lines',
+    name='Trend',
+    marker_color="red",
+    marker=dict(
+        line=dict(width=1)
+    ),
+    legendrank=2,
+    )
 
-    return df
+    trace_upper_band = Scatter(
+        x=x_data,
+        y=y_data_upper_band,
+        mode='lines',
+        name='Upper Band',
+        marker_color='#57b88f',
+        fill='tonexty',
+        legendrank=3,
+    )
 
+    trace_lower_band = Scatter(
+        x=x_data,
+        y=y_data_lower_band,
+        name='Lower Band',
+        mode='lines',
+        marker_color='#1705ff',
+        legendrank=4,
+    )
+
+    # trace_actual = Scatter(
+    #     name='Actual price',
+    #     mode='markers',
+    #     x=list(df0['ds']),
+    #     y=list(df0['y']),
+    #     marker=dict(
+    #         color='black',
+    #         line=dict(width=2)
+    #     )
+    # )
+
+    plt = plot(
+        [trace_lower_band, trace_upper_band, trace_y, trace_yhat],
+        output_type='div',
+    )
+
+    return plt
 
 
 def list_coin_data():
@@ -275,7 +326,8 @@ def coin_page(request, ticker):
     pull_func = lambda col: coin.objects.values_list(col, flat=True).order_by("-start_date")
 
     name = coin.objects.last().name.capitalize()
-    coin_plot = line_plot(name, ticker)
+    coin_plot     = line_plotter(name, ticker)
+    forecast_plot = forecast_plotter(name, ticker, "price_close")
 
     context = dict(        
         ticker    = ticker,
@@ -290,7 +342,8 @@ def coin_page(request, ticker):
             pull_func("volume_traded"),
             pull_func("trades_count")),
             coin_icon = icon_path(coin.__ticker__),
-        coin_plot = coin_plot,
+        coin_plot     = coin_plot,
+        forecast_plot = forecast_plot,
     )
 
     return render(request, f"sandbox/coin_page.html", context)
