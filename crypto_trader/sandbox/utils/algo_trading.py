@@ -167,7 +167,7 @@ def ohlc_forecast(name="Bitcoin", ticker="BTC", col="price_close"):
 @set__str__("svc")
 def ml_svc_apply(model: str, name: str, ticker: str, market_cap="midcap"):
     data_path  = DATA_PATH(name)
-    model_path = f"{BASE_DIR}/models/{ticker.lower()}_{model.lower()}_model.pkl"
+    model_path = f"{BASE_DIR}/ml_resources/{ticker.lower()}_{model.lower()}_model.pkl"
     
     forecast = pd.read_pickle(model_path)
     ohlcv_df = pd.read_csv(
@@ -244,9 +244,9 @@ def ml_svc_apply(model: str, name: str, ticker: str, market_cap="midcap"):
 
 
 @set__str__("adaboost")
-def ml_adaboost_apply(model: str, name: str, ticker: str, market_cap="midcap"):
+def ml_adaboost_apply(model: str, name: str, ticker: str):
     data_path  = DATA_PATH(name)
-    model_path = f"{BASE_DIR}/models/{ticker.lower()}_{model.lower()}_model.pkl"
+    model_path = f"{BASE_DIR}/ml_resources/{ticker.lower()}_{model.lower()}_model.pkl"
     
     forecast = pd.read_pickle(model_path)
     ohlcv_df = pd.read_csv(

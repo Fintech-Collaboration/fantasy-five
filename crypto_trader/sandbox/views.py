@@ -26,8 +26,8 @@ from .utils.coin          import icon_path, get_coin_data
 from .utils.algo_trading  import (
     dmac,
     ohlc_forecast,
-    ml_classifier_apply,
-    ml_booster_apply
+    ml_svc_apply,
+    ml_adaboost_apply,
 )
 
 from .models import (
@@ -303,7 +303,7 @@ def forecast_plotter(name: str, ticker: str, col: str):
     return plt
 
 
-def ml_plotter(model_func, name: str, ticker: str):
+def ml_cap_plotter(model_func, name: str, ticker: str):
     name       = "".join(name.split(" "))
     market_cap = {
         "lowcap":  {"type": "Low-Cap",  "color": "red"},
@@ -350,6 +350,46 @@ def ml_plotter(model_func, name: str, ticker: str):
     )
 
     return plt
+    
+
+def ml_coin_plotter(model_func, name: str, ticker: str):
+    name = "".join(name.split(" "))
+
+    pred_df = model_func(
+        model=model_func.__str__(),
+        name=name,
+        ticker=ticker,
+    )
+
+    # Plot the actual returns versus the strategy returns
+    x_data_cum_prod          = pred_df.index
+    y_data_cum_prod_actual   = (1 + pred_df['Actual Returns'  ]).cumprod() - 1
+    y_data_cum_prod_strategy = (1 + pred_df['Strategy Returns']).cumprod() - 1
+
+    trace_strategy = Scatter(
+        x=x_data_cum_prod,
+        y=y_data_cum_prod_strategy,
+        name=f"Strategy Returns",
+        mode="lines",
+        marker_color="orange",
+        legendrank=1,
+    )
+
+    traces_actual = Scatter(
+        x=x_data_cum_prod,
+        y=y_data_cum_prod_actual,
+        name="Actual Returns",
+        mode="lines",
+        marker_color="green",
+        legendrank=0,
+    )
+
+    plt = plot(
+        [trace_strategy, traces_actual],
+        output_type="div",
+    )
+
+    return plt
 
 
 def list_coin_data():
@@ -388,8 +428,8 @@ def coin_page(request, ticker: str):
     name = coin.objects.last().name.capitalize()
     coin_plot     = line_plotter(name, ticker)
     # forecast_plot = forecast_plotter(name, ticker, "price_close")
-    ml_svc_plot   = ml_plotter(ml_classifier_apply, name, ticker)
-    ml_boost_plot = ml_plotter(ml_booster_apply, name, ticker)
+    ml_svc_plot   = ml_cap_plotter(ml_svc_apply, name, ticker)
+    ml_boost_plot = ml_coin_plotter(ml_adaboost_apply, name, ticker)
 
     context = dict(        
         ticker    = ticker,

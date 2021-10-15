@@ -1,0 +1,15 @@
+# Import a new classifier from SKLearn
+from sklearn.ensemble    import AdaBoostClassifier
+from sklearn.naive_bayes import GaussianNB
+
+# Initiate the base estimator
+base_estimator = GaussianNB()
+base_estimator.fit(X_train_scaled, y_train)
+
+# Initiate the model instance
+model = AdaBoostClassifier(
+    base_estimator=base_estimator,
+    n_estimators=24,
+    learning_rate=2.2,
+    random_state=1,
+)
