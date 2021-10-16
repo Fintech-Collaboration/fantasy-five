@@ -63,13 +63,6 @@ def ohlc_forecast(name="Bitcoin", ticker="BTC", col="price_close"):
     ## Install and import the required libraries and dependencies
     """
 
-    TITLE_DICT = {
-        "price_close": "Market Open",
-        "price_high":  "Daily High",
-        "price_low":   "Daily Low",
-        "price_close": "Market Close",
-    }
-
     name   = name.lower()
     ticker = ticker.lower()
 
@@ -77,16 +70,13 @@ def ohlc_forecast(name="Bitcoin", ticker="BTC", col="price_close"):
     data_path        = DATA_PATH(name)
     forecast_period  = 90
     index_column     = ticker + "_start_date"
-    x_val            = ticker + "_start_date.year"
-    y_val            = ticker + "_start_date.quarter"
-    title_heatmap = f"Transaction Volume Heatmap For: {TITLE_DICT[col]}"
 
     # Set the "Date" column as the Datetime Index.
     df_crypto = pd.read_csv(
-    data_path, 
-    index_col=index_column, 
-    parse_dates = True, 
-    infer_datetime_format = True
+        data_path, 
+        index_col=index_column, 
+        parse_dates = True, 
+        infer_datetime_format = True
     )
 
     # Reserve a DF with no Index, if needed
@@ -98,32 +88,6 @@ def ohlc_forecast(name="Bitcoin", ticker="BTC", col="price_close"):
 
     # Do we have any nulls?
     df_crypto_index.isnull().sum()
-
-    """ ANALYSIS """
-    # Price Trends
-    df_crypto_index.plot(
-        figsize=(20,10),
-        xlabel="Date",
-        ylabel=" ".join([s.capitalize() for s in f"{col}".split(" ")]),
-        title=f"{TITLE_DICT[col].split(' ')[0]} Price Trend"
-    )
-
-    # HeatMap for Crypto
-    hv.extension('bokeh')
-
-    heat_plt = df_crypto_index.hvplot.heatmap(
-        x=x_val,
-        y=y_val,
-        C=col,
-        cmap = "Purples",
-        xlabel="Year",
-        ylabel="Year by Quarter",
-        title=title_heatmap,
-        width=1000,
-        height=500
-    ).aggregate(
-        function=np.mean
-    )
 
     """ FORECAST """
     # Prep the data
@@ -150,19 +114,10 @@ def ohlc_forecast(name="Bitcoin", ticker="BTC", col="price_close"):
     # Make Predictions
     forecast_crypto = m_crypto.predict(future_crypto)
 
-    # plot the forecast
-    hv.extension('bokeh')
-    plt = m_crypto.plot(
-        forecast_crypto,
-        xlabel="Time Line - (ds)",
-        ylabel=f"Prediction: {TITLE_DICT[col]} - (y)",
-        figsize=(16,8),
-    )
-
     """ ACTUAL price prediction for the Forecast range (set in variable declaration) ... in case we want to show """
     forecast_crypto[['ds', 'yhat', 'yhat_lower', 'yhat_upper']].tail(forecast_period)
 
-    return forecast_crypto, df_crypto_noindex_prophet
+    return forecast_crypto, df_crypto
 
 
 @set__str__("svc")

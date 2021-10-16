@@ -2,12 +2,15 @@ from logging import makeLogRecord
 import os
 from pickle import MARK
 
-import numpy as np
+import numpy  as np
+from numpy.core.numeric import zeros_like
+import pandas as pd
 
-from datetime          import datetime
-from plotly.offline    import plot
-from plotly.graph_objs import Scatter
-from pathlib           import Path
+from datetime             import datetime
+from plotly.offline       import plot
+from plotly.graph_objs    import Scatter
+from plotly.graph_objects import Heatmap
+from pathlib              import Path
 
 from django.urls                    import reverse_lazy
 from django.shortcuts               import render, redirect
@@ -233,14 +236,36 @@ def line_plotter(name: str, ticker: str):
     return plt
 
 
-def forecast_plotter(name: str, ticker: str, col: str):
-    name  = "".join(name.split(" "))
-    df_forecast, df = ohlc_forecast(name, ticker, col)
+def heatmap_plotter(df: pd.DataFrame, name: str, ticker: str, col="volume_traded"):
+    df["year"]    = df.index.year
+    df["quarter"] = df.index.quarter
 
-    trace_name = " ".join([s.capitalize() for s in f"{col}".split("_")])
+    avg_df = df.groupby(["year", "quarter"]).mean().reset_index()
+    x_data = avg_df["year"]
+    y_data = avg_df["quarter"]
+    z_data = avg_df[col]
+
+    trace = Heatmap(
+        x=x_data,
+        y=y_data,
+        z=z_data,
+        colorscale="purples",
+    )
+
+    plt = plot(
+        [trace,],
+        output_type="div",
+    )
+
+    return plt
+
+def forecast_plotter(name: str, ticker: str, col: str):
+    name            = "".join(name.split(" "))
+    df_forecast, df = ohlc_forecast(name, ticker, col)
+    trace_name      = " ".join([s.capitalize() for s in f"{col}".split("_")])
 
     x_data            = df_forecast["ds"]
-    y_data_y          = df["y"]
+    y_data_y          = df[col]
     y_data_yhat       = df_forecast["yhat"]
     y_data_upper_band = df_forecast['yhat_upper']
     y_data_lower_band = df_forecast['yhat_lower']
@@ -300,12 +325,14 @@ def forecast_plotter(name: str, ticker: str, col: str):
     #     )
     # )
 
-    plt = plot(
+    forecast_plt = plot(
         [trace_lower_band, trace_upper_band, trace_y, trace_yhat],
         output_type="div",
     )
 
-    return plt
+    heatmap_plt = heatmap_plotter(df, name, ticker)
+
+    return forecast_plt, heatmap_plt
 
 
 def ml_cap_plotter(model_func, name: str, ticker: str):
@@ -431,11 +458,11 @@ def coin_page(request, ticker: str):
     
     pull_func = lambda col: coin.objects.values_list(col, flat=True).order_by("-start_date")
 
-    name = coin.objects.last().name.capitalize()
+    name          = coin.objects.last().name.capitalize()
     coin_plot     = line_plotter(name, ticker)
-    # forecast_plot = forecast_plotter(name, ticker, "price_close")
     ml_svc_plot   = ml_cap_plotter(ml_svc_apply, name, ticker)
     ml_boost_plot = ml_coin_plotter(ml_adaboost_apply, name, ticker)
+    forecast_plot, heatmap_plot = forecast_plotter(name, ticker, "price_close")
 
     context = dict(        
         ticker    = ticker,
@@ -451,7 +478,8 @@ def coin_page(request, ticker: str):
             pull_func("trades_count")),
             coin_icon = icon_path(coin.__ticker__),
         coin_plot     = coin_plot,
-        # forecast_plot = forecast_plot,
+        forecast_plot = forecast_plot,
+        heatmap_plot  = heatmap_plot,
         ml_svc_plot   = ml_svc_plot,
         ml_boost_plot = ml_boost_plot,
     )

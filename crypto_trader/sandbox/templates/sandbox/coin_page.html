@@ -74,6 +74,24 @@
               <div class="plot_div">{{ coin_plot }}</div>
               {% endautoescape %}
             </div><br><br>
+          </div><br><br>          
+
+          <div class="coin_algo_card_sub">
+            <h3>Timeseries Forecasting</h3>
+            <div class="portfolio_card">
+              {% autoescape off %}
+              <div class="plot-div">{{ forecast_plot }}</div>
+              {% endautoescape %}
+            </div><br><br>
+          </div><br><br>          
+
+          <div class="coin_algo_card_sub">
+            <h3>Average Yearly Trading Volume by Quarter</h3>
+            <div class="portfolio_card">
+              {% autoescape off %}
+              <div class="plot-div">{{ heatmap_plot }}</div>
+              {% endautoescape %}
+            </div><br><br>
           </div><br><br>
 
           <div class="coin_algo_card_sub">
