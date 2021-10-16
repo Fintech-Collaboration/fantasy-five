@@ -476,7 +476,7 @@ def transaction_create_view(request, ticker: str):
     context = dict(
         portfolios    = user_portfolios,
         coin_name     = coin_data_now.name,
-        start_date    = coin_data_now.start_date.strftime("%Y-%b-%d"),
+        start_date    = coin_data_now.start_date,
         price_open    = coin_data_now.price_open,
         price_high    = coin_data_now.price_high,
         price_low     = coin_data_now.price_low,
@@ -502,21 +502,26 @@ def transaction_execute(request, ticker: str):
         coin_data_length = len(coin_data_all)-1
 
         # Set transaction data
-        coin_data_now    = coin_data_all[coin_data_length]
-        coin_cost        = coin_count * float(coin_data_now.price_close)
-        portfolio        = Portfolio.objects.all().filter(nickname = portfolio_nickname)[0]
-        time_executed    = datetime.now()
+        coin_data_now = coin_data_all[coin_data_length]
+        coin_cost     = coin_count * float(coin_data_now.price_close)
+        portfolio     = Portfolio.objects.all().filter(nickname = portfolio_nickname)[0]
+        time_executed = datetime.now()
 
-        print(portfolio)
+        print(portfolio.balance)
+        portfolio.balance += coin_cost
+        portfolio.save()
+        print(portfolio.balance)
 
-        t = Transaction(
+        transaction = Transaction(
             time_executed=time_executed,
             coin_count=coin_count,
             coin_cost=coin_cost,
             coin=coin_data_now,
             portfolio=portfolio,
         )
-        t.save()
+
+        print(f"trans balance: {transaction.portfolio.balance}")
+        transaction.save()
 
     return redirect("transactionlist")
 """ -------------- """
