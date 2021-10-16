@@ -110,6 +110,11 @@ def home(request):
     return render(request, "sandbox/home.html", context)
 
 
+def about(request):
+    context = {}
+    return render(request, "sandbox/about.html", context)
+
+
 def line_plotter(name: str, ticker: str):
     name  = "".join(name.split(" "))
     short = 50
@@ -501,6 +506,8 @@ def transaction_execute(request, ticker: str):
         coin_cost        = coin_count * float(coin_data_now.price_close)
         portfolio        = Portfolio.objects.all().filter(nickname = portfolio_nickname)[0]
         time_executed    = datetime.now()
+
+        print(portfolio)
 
         t = Transaction(
             time_executed=time_executed,

@@ -1,15 +1,138 @@
-{% extends 'sandbox/base.html' %}
+{% extends './base.html' %}
 {% load static %}
 
 <DOCTYPE html>
 <html lang="en">
     {% block content %}
+    <head>
+        <title>About Page</title>
+      
+        <style>
+        .portfolio_card {
+            margin-top: auto;
+            margin-bottom: auto;
+            width: 850px;
+            margin: 0px auto;
+            background: powderblue;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            padding: 10px;
+            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+            -webkit-box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+            -moz-box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+            border-radius: 5px;
+        }
+        .form_container {
+            margin-top: 20px;
+        }
+        h3 {
+            text-align: center;
+        }
+        .general_text_div {
+            text-align: justify;
+            padding-left: 10px;
+            padding-right: 10px;
+        }
+        .general_image_div {
+            text-align: center;
+            padding-left: 10px;
+            padding-right: 10px;
+            margin-bottom: 20px;
+        }
+        .general_image {
+            width: 830px;
+            height: auto;
+            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+            -webkit-box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+            -moz-box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+            border-radius: 5px;
+        }        
+        .personel_navigation {
+            align-self: center;
+        }
+        .personel_image {
+            width: 230px;
+            height: 230px;
+            margin-top: 8px;
+            margin-bottom: 8px;
+            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+            -webkit-box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+            -moz-box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+            border-radius: 5px;
+        }
+        #form-title{
+            color: #fff;
+        }
+        </style>
+    </head>
+
     <body>
-        {% autoescape off %}
-        {% block body %}
-            <div class="plot-div">{{ coin_plot }}</div>
-        {% endblock %}
-        {% endautoescape %}
+        <div class="container h-50">
+            <div class="d-flex justify-content-center h-100">
+                <div class="portfolio_card">
+                    <div class="general_text_div">
+                        <h3>What is Fantasy-Five?</h3>        
+                        <p>“Fantasy-Five” is a software solution that provides a “sandbox virtual environment” where users can create mock portfolios to practice investing and trading cryptocurrencies. Users can also view historical <a href="https://acronyms.thefreedictionary.com/OHLCV" title="OHLCV thefreedictionary.com" target="_blannk">OHLCV</a> data and analysis based on various criteria for any of the selected twelve cryptocurrencies, four in each of the following categories:</p>
+                        
+                        <center>
+                            High Cap (&gt; $5 b)<br>
+                            Mid Cap ($251 m to $4.99 b)<br>
+                            Low Cap (&lt; $ 250 m)<br>
+                        </center>
+                        
+                        <p>The analysis provides decision-making models with their related predicitons and are generated using Machine Learning and Time Series Forecasting methodologies.</p>
+                    </div>
+
+                    <div class="general_text_div">
+                        <h3>Inspiration</h2>
+                        <p>The inspiration behind Fantasy-Five stems from the amount of attention currently being paid to the crypto space. Our team sought to create an environment where people interested in the crypto space, whether experienced or just starting out, can practice buying, selling, and navigating through the rapidly advancing industry. Users have the freedom to explore their crypto curiosity on Fantasy-Five, then apply what they have learned to their real wallets and portfolios.</p>
+                    </div>
+                    
+                    <div class="general_image_div"><img class="general_image" src="{% static 'img/crypto_happy_map.png' %}" /></div>
+                    <div class="general_image_div"><img class="general_image" src="{% static 'img/crypto_value_chart.png' %}" /></div>
+                      
+                    <div class="general_text_div"></div>
+                        <h3>The Team</h3>
+                        <b>Michael Bejan</b>
+                        -- Data Pipeline Wizard --<br>
+                        <span class="personel_navigation">
+                            <img class="personel_image" src="{% static 'img/michael.jpg' %}" width="200" /><br>
+                            <a href="https://www.linkedin.com/in/michael-bejan-b52496109/" title="Michael Bejan - LinkedIn" target="_blank">LinkedIn | </a>
+                            <a href="https://github.com/mbejan325" title="Michael Bejan - GitHub" target="_blank">GitHub | </a>
+                            <a href="mailto: mbejan@scu.edu?subject=I love Fantasy-Five!!!" title="Michael Bejan - Email" target="_blank">Email</a>
+                        </span><br>
+
+                        <b>Jason Garcia</b>
+                        -- "Only Cares about Looks" Developer --<br>
+                        <span class="personel_navigation">
+                            <img class="personel_image" src="{% static 'img/jason.jpg' %}" width="200" /><br>
+                            <a href="https://www.linkedin.com/in/24-jason-j-garcia/" title="Jason Garcia - LinkedIn" target="_blank">LinkedIn | </a>
+                            <a href="https://github.com/jasonjgarcia24" title="Jason Garcia - GitHub" target="_blank">GitHub | </a>
+                            <a href="mailto: jason.garcia24@gmail.com?subject=I love Fantasy-Five!!!" title="Michael Bejan - Email" target="_blank">Email</a>
+                        </span><br>
+
+                        <b>Srini Goda</b>
+                        -- Taught Machines How to Learn Before It Was Cool --<br>
+                        <span class="personel_navigation">
+                            <img class="personel_image" src="{% static 'img/srini.jpg' %}" width="200" /><br>
+                            <a href="" title="Srini Goda - LinkedIn" target="_blank">LinkedIn | </a>
+                            <a href="https://github.com/sngoda" title="Srini Goda - GitHub" target="_blank">GitHub | </a>
+                            <a href="mailto: sngoda@hotmail.com?subject=I love Fantasy-Five!!!" title="Srini Goda - Email" target="_blank">Email</a>
+                        </span><br>
+                        
+                        <b>Saeed Raghib</b>
+                        -- The Nostradamus of all Things Crypto --<br>
+                        <span class="personel_navigation">
+                            <img class="personel_image" src="{% static 'img/srini.jpg' %}" width="200" /><br>
+                            <a href="www.linkedin.com/in/saeedraghib" title="Saeed Raghib - LinkedIn" target="_blank">LinkedIn | </a>
+                            <a href="https://github.com/saeedraghib" title="Saeed Raghib - GitHub" target="_blank">GitHub | </a>
+                            <a href="mailto: saeed_raghib@msn.com?subject=I love Fantasy-Five!!!" title="Saeed Raghib - Email" target="_blank">Email</a>
+                        </span><br>
+                    </div>
+                </div>
+            </div>
+        </div>
     </body>
     {% endblock %}
 </html>
