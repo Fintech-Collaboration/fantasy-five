@@ -113,12 +113,11 @@ def about(request):
     return render(request, "sandbox/about.html", context)
 
 
-def line_plotter(name: str, ticker: str):
-    name  = "".join(name.split(" "))
+def line_plotter(df: pd.DataFrame, ticker: str):
     short = 50
     long  = 100
 
-    coin_df = dmac(get_coin_data(name, ticker), short=short, long=long)
+    coin_df = dmac(df, short=short, long=long)
     x_data  = coin_df.index
     y_data  = coin_df["price_close"]
 
@@ -277,10 +276,10 @@ def heatmap_plotter(df: pd.DataFrame, name: str, ticker: str, col="volume_traded
     return plt
 
 
-def forecast_plotter(name: str, ticker: str, col: str):
-    name            = "".join(name.split(" "))
-    df_forecast, df = ohlc_forecast(name, ticker, col)
-    trace_name      = " ".join([s.capitalize() for s in f"{col}".split("_")])
+def forecast_plotter(df: pd.DataFrame, name: str, ticker: str, col: str):
+    name        = "".join(name.split(" "))
+    df_forecast = ohlc_forecast(df, col)
+    trace_name  = " ".join([s.capitalize() for s in f"{col}".split("_")])
 
     print(df_forecast)
     print(df)
@@ -387,8 +386,7 @@ def forecast_plotter(name: str, ticker: str, col: str):
     return forecast_plt, heatmap_plt
 
 
-def ml_cap_plotter(model_func, name: str, ticker: str):
-    name       = "".join(name.split(" "))
+def ml_svc_plotter(df: pd.DataFrame):
     market_cap = {
         "lowcap":  {"type": "Low-Cap",  "color": "red"},
         "midcap":  {"type": "Mid-Cap",  "color": "orange"},
@@ -397,12 +395,8 @@ def ml_cap_plotter(model_func, name: str, ticker: str):
 
     pred_df, x_data_cum_prod, y_data_cum_prod_actual, y_data_cum_prod_strategy = {}, {}, {}, {}
     for key, val in market_cap.items():
-        pred_df[key] = model_func(
-            model=model_func.__str__(),
-            name=name,
-            ticker=ticker,
-            market_cap="".join(val["type"].split("-"))
-        )
+        mc = "".join(val["type"].split("-"))
+        pred_df[key] = ml_svc_apply(df, market_cap=mc)
 
         # Plot the actual returns versus the strategy returns
         x_data_cum_prod[key]          = pred_df[key].index
@@ -459,15 +453,8 @@ def ml_cap_plotter(model_func, name: str, ticker: str):
     return plt
     
 
-def ml_coin_plotter(model_func, name: str, ticker: str):
-    name = "".join(name.split(" "))
-    print(f"{name} -- {ticker}")
-
-    pred_df = model_func(
-        model=model_func.__str__(),
-        name=name,
-        ticker=ticker,
-    )
+def ml_adaboost_plotter(df: pd.DataFrame, ticker: str):
+    pred_df = ml_adaboost_apply(df, ticker)
 
     # Plot the actual returns versus the strategy returns
     x_data_cum_prod          = pred_df.index
@@ -598,12 +585,14 @@ def coin_page(request, ticker: str):
         return Http404(f"Coin not found!")
     
     pull_func = lambda col: coin.objects.values_list(col, flat=True).order_by("-start_date")
+    
+    name = coin.objects.last().name.capitalize()
+    df   = get_coin_data(name, ticker)
 
-    name          = coin.objects.last().name.capitalize()
-    coin_plot     = line_plotter(name, ticker)
-    ml_svc_plot   = ml_cap_plotter(ml_svc_apply, name, ticker)
-    ml_boost_plot = ml_coin_plotter(ml_adaboost_apply, name, ticker)
-    forecast_plot, heatmap_plot = forecast_plotter(name, ticker, "price_close")
+    coin_plot     = line_plotter(df, ticker)
+    ml_svc_plot   = ml_svc_plotter(df)
+    ml_boost_plot = ml_adaboost_plotter(df, ticker)
+    forecast_plot, heatmap_plot = forecast_plotter(df, name, ticker, "price_close")
 
     context = dict(
         ticker    = ticker,

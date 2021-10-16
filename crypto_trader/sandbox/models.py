@@ -1,3 +1,5 @@
+import numpy as np
+
 from datetime import datetime
 
 from django.db                           import models
@@ -47,6 +49,14 @@ class Transaction(models.Model):
 
     def __str__(self):
         return f"{self.coin.name} --> {self.portfolio.nickname}"
+
+
+class Forecast(models.Model):
+    ds         = models.FloatField(default=np.nan)
+    yhat       = models.FloatField(default=np.nan)
+    yhat_upper = models.FloatField(default=np.nan)
+    yhat_lower = models.FloatField(default=np.nan)
+    coin       = models.ForeignKey(Coin, on_delete=models.CASCADE)
 
 
 class Aave(Coin):
