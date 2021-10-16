@@ -52,7 +52,8 @@ class Transaction(models.Model):
 
 
 class Forecast(models.Model):
-    ds         = models.FloatField(default=np.nan)
+    timestamp  = models.DateTimeField()
+    ds         = models.DateTimeField()
     yhat       = models.FloatField(default=np.nan)
     yhat_upper = models.FloatField(default=np.nan)
     yhat_lower = models.FloatField(default=np.nan)

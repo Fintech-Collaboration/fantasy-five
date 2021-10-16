@@ -3,6 +3,7 @@ from .models import (
     Coin,
     Portfolio,
     Transaction,
+    Forecast,
     Aave,
     Aragon,
     Augur,
@@ -80,4 +81,5 @@ class TezosAdmin(admin.ModelAdmin):
 admin.site.register(Coin)
 admin.site.register(Portfolio)
 admin.site.register(Transaction)
+admin.site.register(Forecast)
 
