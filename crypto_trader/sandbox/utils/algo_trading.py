@@ -9,6 +9,9 @@ import holoviews as hv
 from fbprophet  import Prophet
 from pathlib    import Path
 
+from sklearn.cluster        import KMeans
+from sklearn.decomposition  import PCA
+from sklearn.preprocessing  import StandardScaler
 from pandas.tseries.offsets import DateOffset
 from sklearn.preprocessing  import StandardScaler
 from sklearn.metrics        import classification_report
@@ -408,4 +411,116 @@ def ml_adaboost_apply0(model: str, name: str, ticker: str):
     predictions_df['Strategy Returns'] = predictions_df['Actual Returns'] * predictions_df['Predicted']
 
     return predictions_df
+
+
+def ml_cluster_apply(names: str, tickers: str):
+    df_market_data = pd.DataFrame()
+
+    for name, ticker in zip(names, tickers):
+        data_path = DATA_PATH(name)
+        crypto_df = pd.read_csv(
+            data_path,
+            index_col=f"{ticker}_start_date"
+        )
+
+        price_changes = dict()
+        price_changes['coin_id'] = name
+
+        for y in [2, 7, 14, 30, 60, 200]:
+            k = 'price_change_pct' + str(y) + 'd'
+            price_changes[k] = [crypto_df.rolling(window=int(y)).mean().pct_change().mean()['price_close']]
+
+        temp_df        = pd.DataFrame(price_changes)
+        df_market_data = pd.concat([temp_df, df_market_data]).reset_index(drop=True)
+    df_market_data = df_market_data.set_index('coin_id').dropna()
+
+    # Use the `StandardScaler()` module from scikit-learn to normalize the data from the CSV file
+    scaled_data = StandardScaler().fit_transform(df_market_data)
+
+    # Create a DataFrame with the scaled data
+    df_market_data_scaled = pd.DataFrame(
+        scaled_data,
+        columns=df_market_data.columns
+    )
+
+    # Copy the crypto names from the original data
+    df_market_data_scaled["coin_id"] = df_market_data.index
+
+    # Set the coinid column as index
+    df_market_data_scaled = df_market_data_scaled.set_index("coin_id")
+
+    # Create a list with the number of k-values to try
+    # Use a range from 1 to 11
+    k = range(1,11)
+
+    # Create an empy list to store the inertia values
+    inertia = []
+
+    # Create a for loop to compute the inertia with each possible value of k
+    for i in k:
+        model = KMeans(n_clusters=i, random_state=1)
+        model.fit(df_market_data_scaled)
+        inertia.append(model.inertia_)
+
+    # Initialize the K-Means model using the best value for k
+    model = KMeans(n_clusters=4, random_state=1)
+
+    # Fit the K-Means model using the scaled data
+    model.fit(df_market_data_scaled)
+
+    # Predict the clusters to group the cryptocurrencies using the scaled data
+    k4 = model.predict(df_market_data_scaled)
+
+    # Add a new column to the DataFrame with the predicted clusters
+    df_market_data_scaled['predicted_clusters'] = k4
+
+    # Create a PCA model instance and set `n_components=3`.
+    pca = PCA(n_components=3)
+
+    # Use the PCA model with `fit_transform` to reduce to 
+    # three principal components.
+    pca_fit = pca.fit_transform(df_market_data_scaled)
+
+    # Creating a DataFrame with the PCA data
+    pca_fit_df = pd.DataFrame(pca_fit, columns=["PCA1", "PCA2", "PCA3"])
+
+    # Copy the crypto names from the original data
+    pca_fit_df['coin_id'] = df_market_data.index
+
+    # Set the coinid column as index
+    pca_fit_df.set_index('coin_id', inplace=True)
+
+    # Create a list with the number of k-values to try
+    # Use a range from 1 to 11
+    k = range(1, 11)
+
+    # Create an empy list to store the inertia values
+    inertia = []
+
+    # Create a for loop to compute the inertia with each possible value of k
+    for i in k:
+        pca_model = KMeans(n_clusters=i, random_state=1)
+        pca_model.fit(pca_fit_df)
+        inertia.append(pca_model.inertia_)
+
+
+    # Create a dictionary with the data to plot the Elbow curve
+    pca_elbow_dict = {"k":k, "inertia":inertia}
+
+    # Create a DataFrame with the data to plot the Elbow curve
+    pca_elbow_df = pd.DataFrame(pca_elbow_dict)
+
+    # Initialize the K-Means model using the best value for k
+    elbow_model = KMeans(n_clusters=4, random_state=1)
+
+    # Fit the K-Means model using the PCA data
+    elbow_model.fit(pca_fit_df)
+
+    # Predict the clusters to group the cryptocurrencies using the PCA data
+    pca_k4 = elbow_model.predict(pca_fit_df)
+
+    # Add a new column to the DataFrame with the predicted clusters
+    pca_fit_df['predicted_clusters'] = pca_k4
+
+    return pca_fit_df
 

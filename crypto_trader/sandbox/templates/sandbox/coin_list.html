@@ -7,39 +7,37 @@
   <title>Coin List</title>
 
   <style>
-	.portfolio_card {
-		margin-top: auto;
-		margin-bottom: auto;
-		background: powderblue;
-		position: relative;
-		display: flex;
-		flex-direction: column;
-		padding: 10px;
-		box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
-		-webkit-box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
-		-moz-box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
-		border-radius: 5px;
+	.coin_table_card,
+	.cluster_card {
+	  display: flex;
+	  flex-direction: column;
+	  -webkit-box-align: center;
+	  align-items: center;
+	  width: 1200px;
+	  margin: 0px auto;
+	  background: powderblue;
+	  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+	  -webkit-box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+	  -moz-box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+	  border-radius: 5px;
 	}
-	.form_container {
+	.coin_table_card {
+		padding-top: 20px;
+	}
+	.coin_algo_card_sub {
+		padding-bottom: 5px;
 		margin-top: 20px;
+		margin-bottom: 5px;
+		border-radius: 5px;
+		background: lightpink;
 	}
-	.submit_btn {
-		width: 100%;
-		background: #33ccff !important;
-		color: white !important;
+	.coin_algo_card_sub {
+		width: 1200px;
 	}
-	.submit_btn:focus {
-		box-shadow: none !important;
-		outline: 0px !important;
-	}
-	.submit_container {
-		padding: 0 2rem;
-	}
-	.input_user,
-	.input_pass:focus {
-		box-shadow: none !important;
-		outline: 0px !important;
-	}
+    .plot_div {
+        width: 100%;
+        border-radius: 5px;
+      }
 
     #messages{
         background-color: grey;
@@ -53,7 +51,7 @@
 <body>
 	<div class="container h-50">
 		<div class="d-flex justify-content-center h-100">
-			<div class="portfolio_card">
+			<div class="coin_table_card">
 				<table id="coin_table">
 				<tr>
 					<th> </th>
@@ -80,6 +78,15 @@
 					</tr>
 				{% endfor %}
 				</table>
+
+				<div class="coin_algo_card_sub">
+					<h3>Cryptocurrencies Clusters by Closing Price Metrics</h3>
+					<div class="cluster_card">
+					  {% autoescape off %}
+					  <div class="plot_div">{{ ml_cluster_plot }}</div>
+					  {% endautoescape %}
+					</div><br><br>
+				</div><br><br>
 			</div>
 		</div>
 	</div>

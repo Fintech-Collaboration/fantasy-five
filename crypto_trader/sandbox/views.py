@@ -9,7 +9,7 @@ import pandas as pd
 from datetime             import datetime
 from plotly.offline       import plot
 from plotly.graph_objs    import Scatter
-from plotly.graph_objects import Heatmap
+from plotly.graph_objects import Figure, Heatmap
 from pathlib              import Path
 
 from django.urls                    import reverse_lazy
@@ -31,6 +31,7 @@ from .utils.algo_trading  import (
     ohlc_forecast,
     ml_svc_apply,
     ml_adaboost_apply,
+    ml_cluster_apply,
 )
 
 from .models import (
@@ -425,6 +426,43 @@ def ml_coin_plotter(model_func, name: str, ticker: str):
     return plt
 
 
+def ml_cluster_plotter():
+    names   = [m.__name__.lower() for m in COIN_MODELS]
+    tickers = [m.__ticker__.lower() for m in COIN_MODELS]
+
+    print(names)
+
+    cluster_df = ml_cluster_apply(names, tickers)
+    print(list(cluster_df["predicted_clusters"]))
+
+    # trace = Scatter(
+    #     x=list(cluster_df["PCA1"]),
+    #     y=list(cluster_df["PCA2"]),
+    #     mode="markers",
+    #     marker=dict(
+    #         color=list(cluster_df["predicted_clusters"]),
+    #     ),
+    # )
+
+    trace = Scatter(
+        x=cluster_df["PCA1"],
+        y=cluster_df["PCA2"],
+        mode='markers',
+        marker_size=25,
+        marker=dict(color=cluster_df["predicted_clusters"]),
+        opacity=0.4,
+    )
+
+    fig = Figure(data=trace)
+
+    plt = plot(
+        fig,
+        output_type="div",
+    )
+
+    return plt
+
+
 def list_coin_data():
     coin_data = []
     for coin in COIN_MODELS:
@@ -444,8 +482,13 @@ def list_coin_data():
 
 """ WALLET METHODS """
 def coin_table(request):
-    coin_data = list_coin_data()
-    context   = {"coin_data": coin_data}
+    coin_data       = list_coin_data()
+    ml_cluster_plot = ml_cluster_plotter()
+
+    context = dict(
+        coin_data       = coin_data,
+        ml_cluster_plot = ml_cluster_plot,
+    )
         
     return render(request, "sandbox/coin_list.html", context)
 
