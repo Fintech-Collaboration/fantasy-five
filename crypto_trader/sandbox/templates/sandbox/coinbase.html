@@ -48,7 +48,7 @@
     <span class="navigation-bar">
       <a href="{% url 'home' %}"><img style="height: 38px" src="{% static 'img/fantasyFive_01.png' %}" /></a>
       <a href="{% url 'home' %}">Home | </a>
-      <a href="{% url 'about' %}">About | </a>
+      <a href="{% url 'about' %}">Meet the Team | </a>
       <a href="{% url 'portfoliolist' %}">Portfolio | </a>
       <a href="{% url 'cointable' %}">Crypto Options | </a>
       <a href="{% url 'transactionlist' %}">Transactions | </a>
@@ -66,7 +66,6 @@
     {% endif %}
   </div>
 
-  <h1 class="page-title">Welcome to Fantasy-Five Sandbox!</h1>
   {% block content %}
   {% endblock %}
 

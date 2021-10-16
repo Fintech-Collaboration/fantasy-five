@@ -12,6 +12,7 @@
     <title>Coin Table</title>
     <style>
       .portfolio_card,
+      .plot_card,
       .coin_table_card_sub {
         display: flex;
         flex-direction: column;
@@ -24,6 +25,9 @@
         -webkit-box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
         -moz-box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
         border-radius: 5px;
+      }
+      .portfolio_card {
+        padding-top: 20px;
       }
 			.coin_algo_card_sub,
       .coin_table_card_sub {
@@ -46,6 +50,8 @@
   </head>
 
   <body>
+    <h1 class="page-title">Data, Data, and more Data!</h1>
+
     <script src="https://cdn.bokeh.org/bokeh/release/bokeh-2.3.3.min.js"></script>
     <script src="https://cdn.bokeh.org/bokeh/release/bokeh-widgets-2.3.3.min.js"></script>
     <script src="https://cdn.bokeh.org/bokeh/release/bokeh-tables-2.3.3.min.js"></script>
@@ -69,7 +75,7 @@
           <div class="coin_algo_card_sub">
             <h3>Dual Moving Average Crossover (DMAC)</h3>
             {% block body %}
-            <div class="portfolio_card">
+            <div class="plot_card">
               {% autoescape off %}
               <div class="plot_div">{{ coin_plot }}</div>
               {% endautoescape %}
@@ -78,7 +84,7 @@
 
           <div class="coin_algo_card_sub">
             <h3>Timeseries Forecasting</h3>
-            <div class="portfolio_card">
+            <div class="plot_card">
               {% autoescape off %}
               <div class="plot_div">{{ forecast_plot }}</div>
               {% endautoescape %}
@@ -87,7 +93,7 @@
 
           <div class="coin_algo_card_sub">
             <h3>Average Yearly Trading Volume by Quarter</h3>
-            <div class="portfolio_card">
+            <div class="plot_card">
               {% autoescape off %}
               <div class="plot_div">{{ heatmap_plot }}</div>
               {% endautoescape %}
@@ -96,7 +102,7 @@
 
           <div class="coin_algo_card_sub">
             <h3>Machine Learning Strategy Models<br>Support Vector Classifier</h3>
-            <div class="portfolio_card">
+            <div class="plot_card">
               {% autoescape off %}
               <div class="plot_div">{{ ml_svc_plot }}</div>
               {% endautoescape %}
@@ -105,7 +111,7 @@
 
           <div class="coin_algo_card_sub">
             <h3>Machine Learning Strategy Models<br>AdaBoost Classifier with Gaussian Naive Bayes</h3>
-            <div class="portfolio_card">
+            <div class="plot_card">
               {% autoescape off %}
               <div class="plot_div">{{ ml_boost_plot }}</div>
               {% endautoescape %}
