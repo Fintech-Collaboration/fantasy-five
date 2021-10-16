@@ -1,5 +1,6 @@
 {% extends './coinbase.html' %}
 {% load static %}
+{% load humanize %}
 
 <DOCTYPE html>
 <html lang="en">
@@ -21,6 +22,9 @@
 				-webkit-box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 				-moz-box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 				border-radius: 5px;
+			}
+			.coin_table_card_sub {
+				width: 750px;
 			}
 			.transaction_card_sub {
 				width: 400px;
@@ -49,51 +53,53 @@
 	<body>
 		<div class="container h-50">
 			<div class="d-flex justify-content-center h-100">
-			<div class="transaction_card">
-          
-				<div class="coin-icon-div">
-				  <img class="coin-icon-img" src="{% static coin_icon %}" alt={{ ticker }}>
-				  <label class="coin-icon-label">{{ ticker }}</label><br>
+				<div class="transaction_card">
+			
+					<div class="coin-icon-div">
+						<img class="coin-icon-img" src="{% static coin_icon %}" alt={{ ticker }}>
+						<label class="coin-icon-label">{{ ticker }}</label><br>
+					</div>
+					<div>
+						<a href="{% url 'coinpage' ticker %}"><button>Analysis</button></a>
+					</div><br>
+					
+					<table class="coin_table_card_sub">
+						<tr>
+							<th>Date</th>
+							<th>Opening Price<br>(USD)</th>
+							<th>24H High<br>(USD)</th>
+							<th>24H Low<br>(USD)</th>
+							<th>Closing Price<br>(USD)</th>
+							<th>Volume</th>
+							<th>Trades</th>
+						</tr> 
+						<tr>
+							<td>{{ start_date|date:"Y-M-d" }}</td>
+							<td>${{ price_open|floatformat:"2"|intcomma }}</td>
+							<td>${{ price_high|floatformat:"2"|intcomma }}</td>
+							<td>${{ price_low|floatformat:"2"|intcomma }}</td>
+							<td>${{ price_close|floatformat:"2"|intcomma }}</td>
+							<td>{{ volume_traded|floatformat:"0"|intcomma }}</td>
+							<td>{{ trades_count|floatformat:"0"|intcomma }}</td>
+						</tr>
+					</table>
+			
+					<div class="transaction_card_sub">
+						<form class="coin_buy_form" name="coin-buy-form" method="POST" action="{% url 'transactionexecute' ticker %}">
+							{% csrf_token %}
+							<h3>Purchase {{ coin_name }}</h3>
+							<label class="portfolio_buy_label" for="portfolio-buy-select">Portfolio&nbsp;&nbsp;&nbsp;&nbsp;</label>
+							<select class="portfolio_buy_select" id="portfolio-buy-select" name="portfolio-buy-select" style="height: 24px; width: 158px;">
+								{% for p in portfolios %}
+									<option value="{{ p.nickname }}">{{ p.nickname }}</option>
+								{% endfor %}
+							</select><br>
+							<label class="coin_buy_label" for="coin-buy-input">Coins&nbsp;&nbsp;&nbsp;&nbsp;</label>
+							<input class="coin_buy_input" type="number" id="coin-buy-input" name="coin-buy-input" step="any" style="height: 18px; width: 150px;" /><br><br>
+							<input class="btn submit_btn" type="submit" value="Submit">
+						</form>
+					</div>
 				</div>
-				<div>
-					<a href="{% url 'coinpage' ticker %}"><button>Analysis</button></a>
-				</div><br>
-				
-				<table id="coins">
-				<tr>
-					<th>Date</th>
-					<th>Opening Price (USD)</th>
-					<th>24H High (USD)</th>
-					<th>24H Low (USD)</th>
-					<th>Closing Price (USD)</th>
-					<th>Volume</th>
-					<th>Trades</th>
-				</tr> 
-				<tr>
-					<td>{{ start_date }}</td>
-					<td>{{ price_open }}</td>
-					<td>{{ price_high }}</td>
-					<td>{{ price_low }}</td>
-					<td>{{ price_close }}</td>
-					<td>{{ volume_traded }}</td>
-					<td>{{ trades_count }}</td>
-				</tr>
-				</table>
-		
-			<div class="transaction_card_sub">
-				<form class="coin_buy_form" name="coin-buy-form" method="POST" action="{% url 'transactionexecute' ticker %}">
-					{% csrf_token %}
-					<h3>Purchase {{ coin_name }}</h3>
-					<label class="portfolio_buy_label" for="portfolio-buy-select">Portfolio&nbsp;&nbsp;&nbsp;&nbsp;</label>
-					<select class="portfolio_buy_select" id="portfolio-buy-select" name="portfolio-buy-select" style="height: 24px; width: 158px;">
-						{% for p in portfolios %}
-							<option value="{{ p.nickname }}">{{ p.nickname }}</option>
-						{% endfor %}
-					</select><br>
-					<label class="coin_buy_label" for="coin-buy-input">Coins&nbsp;&nbsp;&nbsp;&nbsp;</label>
-					<input class="coin_buy_input" type="number" id="coin-buy-input" name="coin-buy-input" step="any" style="height: 18px; width: 150px;" /><br><br>
-					<input class="btn submit_btn" type="submit" value="Submit">
-				</form>
 			</div>
 		</div>
 		<script>

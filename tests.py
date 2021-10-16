@@ -1,19 +1,13 @@
-# import pickle
+from crypto_trader.sandbox.utils.algo_trading import ml_cluster_apply
 
-# pkl_file = r"C:\Users\JasonGarcia24\FINTECH\workspace\fantasy-five\crypto_trader\sandbox\data\aave_model.pkl"
 
-# with open(pkl_file, 'rb') as f:
-#     data = pickle.load(f)
+names   = ['aave', 'aragon', 'augur', 'balancer', 'bitcoin', 'cardano', 'cosmos', 'ethereum', 'ethereumclassic', 'orchid', 'tether', 'tezos']
+tickers = ['aave', 'ant', 'rep', 'bal', 'btc', 'ada', 'atom', 'eth', 'etc', 'oxt', 'usdt', 'xtz']
 
-# breakpoint()
 
-# gh = 1
-
-import pickle
-from crypto_trader.sandbox.utils.algo_trading import ohlc_forecast, ml_apply
-
-pickle_path = r"C:\Users\JasonGarcia24\FINTECH\workspace\fantasy-five\crypto_trader\sandbox\data\aave_model.pkl"
-forecast_df = ml_apply(pickle_path)
+pca_df = ml_cluster_apply(names, tickers)
 
 breakpoint()
-sl = 1
+
+gh = 1
+

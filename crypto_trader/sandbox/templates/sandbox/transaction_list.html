@@ -1,31 +1,101 @@
 {% extends './base.html' %}
 {% load static %}
+{% load humanize %}
 
 <DOCTYPE html>
 <html lang="en">
   {% block content %}
-  <h2>Transaction List</h2>
-  <table id="transaction">
-    <tr>
-      <th>Date</th>
-      <th>Coin Count</th>
-      <th>Total Cost</th>
-      <th>Coin Purchased</th>
-      <th>Portfolio</th>
-        <th> </th>
-        <th> </th>
-    </tr>
-    {% for transaction in transactions %}
-      {% if request.user.username == transaction.portfolio.owner.username %}
-        <tr>
-            <td>{{ transaction.time_executed }}</td>
-            <td>{{ transaction.coin_count }}</td>
-            <td>{{ transaction.coin_cost }}</td>
-            <td>{{ transaction.coin }}</td>
-            <td><a href="{% url 'portfoliolist' %}">{{ transaction.portfolio.nickname }}</a></td>
-        </tr>
-      {% endif %}
-    {% endfor %}
-  </table>
+  <head>
+  <title>Transaction List</title>
+
+    <style>
+			.transaction_card,
+      .transaction_card_sub {
+        display: flex;
+        flex-direction: column;
+        -webkit-box-align: center;
+        align-items: center;
+        width: 1200px;
+        margin: 0px auto;
+        background: powderblue;
+        box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+        -webkit-box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+        -moz-box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+        border-radius: 5px;
+			}
+      .transaction_table_sub {
+        padding-top: 10px;
+				padding-bottom: 10px;
+        border-radius: 5px;
+			}
+      .submit_btn {
+        width: 100%;
+        background: #33ccff !important;
+        color: white !important;
+      }
+      .submit_btn:focus {
+        box-shadow: none !important;
+        outline: 0px !important;
+      }
+      .submit_container {
+        padding: 0 2rem;
+      }
+      .input-group-text {
+        background: #f7ba5b !important;
+        color: white !important;
+        border: 0 !important;
+        border-radius: 0.25rem 0 0 0.25rem !important;
+      }
+      .input_user,
+      .input_pass:focus {
+        box-shadow: none !important;
+        outline: 0px !important;
+      }    
+      #messages{
+          background-color: grey;
+          color: #fff;
+          padding: 10px;
+          margin-top: 10px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <h1 class="page-title">Your Transactions</h1>
+    <div class="container h-50">
+      <div class="d-flex justify-content-center h-100">
+        <div class="transaction_card">
+          <div class="transaction_table_sub">
+            <table class="transaction_table">
+              <tr>
+                <th>Date</th>
+                <th>Coin Count</th>
+                <th>Total Cost (USD)</th>
+                <th>Coin</th>
+                <th>Portfolio</th>
+                <th>Messages</th>
+                <th>Portfolio Balance</th>
+                  <th> </th>
+                  <th> </th>
+              </tr>
+              {% for transaction in transactions %}
+                {% if request.user.username == transaction.portfolio.owner.username %}
+                  <tr>
+                      <td style="width: 220px">{{ transaction.time_executed }}</td>
+                      <td style="width: 100px">{{ transaction.coin_count|floatformat:"2"|intcomma }}</td>
+                      <td style="width: 150px">${{ transaction.coin_cost|floatformat:"2"|intcomma }}</td>
+                      <td style="width: 90px"d><a href="{% url 'coinpage' transaction.coin %}">{{ transaction.coin }}</a></td>
+                      <td style="width: 150px"><a href="{% url 'portfoliolist' %}">{{ transaction.portfolio.nickname }}</a></td>
+                      <td style="width: 150px">{{ transaction.message }}</td>
+                      <td style="width: 150px">${{ transaction.portfolio_balance|floatformat:"2"|intcomma }}</td>
+                  </tr>
+                {% endif %}
+              {% endfor %}
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
   {% endblock %}
 </html>

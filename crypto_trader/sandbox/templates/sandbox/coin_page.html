@@ -1,5 +1,6 @@
 {% extends './coinbase.html' %}
 {% load static %}
+{% load humanize %}
 
 <DOCTYPE html>
 <html lang="en">  
@@ -11,6 +12,7 @@
     <title>Coin Table</title>
     <style>
       .portfolio_card,
+      .plot_card,
       .coin_table_card_sub {
         display: flex;
         flex-direction: column;
@@ -24,12 +26,15 @@
         -moz-box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
         border-radius: 5px;
       }
+      .portfolio_card {
+        padding-top: 20px;
+      }
 			.coin_algo_card_sub,
       .coin_table_card_sub {
 				padding-bottom: 5px;
         margin-bottom: 5px;
-				background: lightpink;
         border-radius: 5px;
+        background: lightpink;
 			}
 			.coin_algo_card_sub {
 				width: 1200px;
@@ -37,14 +42,15 @@
 			.coin_table_card_sub {
 				width: 750px;
 			}
+      .plot_div {
+        width: 100%;
+        border-radius: 5px;
+      }
     </style>
   </head>
 
-  <body>
-    <script src="https://cdn.bokeh.org/bokeh/release/bokeh-2.3.3.min.js"></script>
-    <script src="https://cdn.bokeh.org/bokeh/release/bokeh-widgets-2.3.3.min.js"></script>
-    <script src="https://cdn.bokeh.org/bokeh/release/bokeh-tables-2.3.3.min.js"></script>
-    <script src="https://cdn.bokeh.org/bokeh/release/bokeh-api-2.3.3.min.js"></script>
+  <body>    
+    <h1 class="page-title">Data, Data, and more Data!</h1>
 
     <div class="container h-50">
       <div class="d-flex justify-content-center h-100">
@@ -61,50 +67,90 @@
             <a href="{% url 'transactioncreate' ticker %}"><button>Buy</button></a>
           </div><br>
 
-          <div class="coin_algo_card_sub">
-            <h3>Smooth Moving Average</h3>
+          <div class="container">
+            <span class="navigation-bar">
+              <a href="#DMAC">DMAC | </a>
+              <a href="#Timeseries-Forecasting">Timeseries Forecasting | </a>
+              <a href="#Avg-Volume-Heatmap">Avg Volume Heatmap | </a>
+              <a href="#SVC">SVC | </a>
+              <a href="#AdaBoost">AdaBoost | </a>
+              <a href="#The-Numbers">Just The Data |</a>
+              <a href="#The-Last-Numbers">Just The End of Data</a>
+            </span>
+          </div>
+
+          <div class="coin_algo_card_sub" id="DMAC">
+            <h3>Dual Moving Average Crossover (DMAC)</h3>
             {% block body %}
-            <div class="portfolio_card">
+            <div class="plot_card">
               {% autoescape off %}
-              <div class="plot-div">{{ coin_plot }}</div>
+              <div class="plot_div">{{ coin_plot }}</div>
               {% endautoescape %}
             </div><br><br>
           </div><br><br>
 
-          <div class="coin_algo_card_sub">
+          <div class="coin_algo_card_sub" id="Timeseries-Forecasting">
             <h3>Timeseries Forecasting</h3>
-            <div class="portfolio_card">
+            <div class="plot_card">
               {% autoescape off %}
-              <div class="plot-div">{{ forecast_plot }}</div>
+              <div class="plot_div">{{ forecast_plot }}</div>
+              {% endautoescape %}
+            </div><br><br>
+          </div><br><br>          
+
+          <div class="coin_algo_card_sub" id="Avg-Volume-Heatmap">
+            <h3>Average Yearly Trading Volume by Quarter</h3>
+            <div class="plot_card">
+              {% autoescape off %}
+              <div class="plot_div">{{ heatmap_plot }}</div>
+              {% endautoescape %}
+            </div><br><br>
+          </div><br><br>
+
+          <div class="coin_algo_card_sub" id="SVC">
+            <h3>Machine Learning Strategy Models<br>Support Vector Classifier</h3>
+            <div class="plot_card">
+              {% autoescape off %}
+              <div class="plot_div">{{ ml_svc_plot }}</div>
+              {% endautoescape %}
+            </div><br><br>
+          </div><br><br>
+
+          <div class="coin_algo_card_sub" id="AdaBoost">
+            <h3>Machine Learning Strategy Models<br>AdaBoost Classifier with Gaussian Naive Bayes</h3>
+            <div class="plot_card">
+              {% autoescape off %}
+              <div class="plot_div">{{ ml_boost_plot }}</div>
               {% endautoescape %}
             </div><br><br>
           </div><br><br>
           {% endblock %}
 
-          <div class="coin_table_card_sub">
+          <div class="coin_table_card_sub" id="The-Numbers">
             <h3>The Numbers..</h3>
-            <table id="coins">
+            <table id="coins_table">
               <tr>
                 <th>Date</th>
-                <th>Open (USD)</th>
-                <th>24HR High (USD)</th>
-                <th>24HR Low</th>
-                <th>Close (USD)</th>
+                <th>Open<br>(USD)</th>
+                <th>24HR High<br>(USD)</th>
+                <th>24HR Low<br>(USD)</th>
+                <th>Close<br>(USD)</th>
                 <th>Volume</th>
                 <th>Trades</th>
               </tr> 
               {% for start_date, price_open, price_high, price_low, price_close, volume_traded, trades_count in coin_data %}
               <tr>
-                <td>{{ start_date|date:"Y-M-d" }}</td>
-                <td>{{ price_open|floatformat:"2" }}</td>
-                <td>{{ price_high|floatformat:"2" }}</td>
-                <td>{{ price_low|floatformat:"2" }}</td>
-                <td>{{ price_close|floatformat:"2" }}</td>
-                <td>{{ volume_traded|floatformat:"0" }}</td>
-                <td>{{ trades_count|floatformat:"0" }}</td>
+                <td style="width: 180px">{{ start_date|date:"Y-M-d" }}</td>
+                <td style="width: 90px">${{ price_open|floatformat:"2"|intcomma }}</td>
+                <td style="width: 90px">${{ price_high|floatformat:"2"|intcomma }}</td>
+                <td style="width: 90px">${{ price_low|floatformat:"2"|intcomma }}</td>
+                <td style="width: 90px">${{ price_close|floatformat:"2"|intcomma }}</td>
+                <td style="width: 110px">{{ volume_traded|floatformat:"0"|intcomma }}</td>
+                <td style="width: 110px">{{ trades_count|floatformat:"0"|intcomma }}</td>
               </tr>
               {% endfor %}
             </table>
+            <p id="The-Last-Numbers">Hey! You made it! <a href="#The-Numbers">Wanna go back?</a></p>
           </div>
         </div>
       </div>
