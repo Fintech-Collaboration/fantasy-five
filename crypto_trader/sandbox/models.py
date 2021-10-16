@@ -37,11 +37,13 @@ class Portfolio(models.Model):
 
 
 class Transaction(models.Model):
-    time_executed = models.DateTimeField()
-    coin_count    = models.FloatField(default=0.0)
-    coin_cost     = models.FloatField(default=0.0)
-    coin          = models.ForeignKey(Coin, on_delete=models.CASCADE)
-    portfolio     = models.ForeignKey(Portfolio, on_delete=models.CASCADE)
+    time_executed     = models.DateTimeField()
+    coin_count        = models.FloatField(default=0.0)
+    coin_cost         = models.FloatField(default=0.0)
+    coin              = models.ForeignKey(Coin, on_delete=models.CASCADE)
+    portfolio         = models.ForeignKey(Portfolio, on_delete=models.CASCADE)
+    portfolio_balance = models.FloatField(default=0.0)
+    message           = CharField(max_length=35, default="")
 
     def __str__(self):
         return f"{self.coin.name} --> {self.portfolio.nickname}"

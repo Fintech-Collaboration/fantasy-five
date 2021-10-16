@@ -49,13 +49,8 @@
     </style>
   </head>
 
-  <body>
+  <body>    
     <h1 class="page-title">Data, Data, and more Data!</h1>
-
-    <script src="https://cdn.bokeh.org/bokeh/release/bokeh-2.3.3.min.js"></script>
-    <script src="https://cdn.bokeh.org/bokeh/release/bokeh-widgets-2.3.3.min.js"></script>
-    <script src="https://cdn.bokeh.org/bokeh/release/bokeh-tables-2.3.3.min.js"></script>
-    <script src="https://cdn.bokeh.org/bokeh/release/bokeh-api-2.3.3.min.js"></script>
 
     <div class="container h-50">
       <div class="d-flex justify-content-center h-100">
@@ -72,7 +67,19 @@
             <a href="{% url 'transactioncreate' ticker %}"><button>Buy</button></a>
           </div><br>
 
-          <div class="coin_algo_card_sub">
+          <div class="container">
+            <span class="navigation-bar">
+              <a href="#DMAC">DMAC | </a>
+              <a href="#Timeseries-Forecasting">Timeseries Forecasting | </a>
+              <a href="#Avg-Volume-Heatmap">Avg Volume Heatmap | </a>
+              <a href="#SVC">SVC | </a>
+              <a href="#AdaBoost">AdaBoost | </a>
+              <a href="#The-Numbers">Just The Data |</a>
+              <a href="#The-Last-Numbers">Just The End of Data</a>
+            </span>
+          </div>
+
+          <div class="coin_algo_card_sub" id="DMAC">
             <h3>Dual Moving Average Crossover (DMAC)</h3>
             {% block body %}
             <div class="plot_card">
@@ -82,7 +89,7 @@
             </div><br><br>
           </div><br><br>
 
-          <div class="coin_algo_card_sub">
+          <div class="coin_algo_card_sub" id="Timeseries-Forecasting">
             <h3>Timeseries Forecasting</h3>
             <div class="plot_card">
               {% autoescape off %}
@@ -91,7 +98,7 @@
             </div><br><br>
           </div><br><br>          
 
-          <div class="coin_algo_card_sub">
+          <div class="coin_algo_card_sub" id="Avg-Volume-Heatmap">
             <h3>Average Yearly Trading Volume by Quarter</h3>
             <div class="plot_card">
               {% autoescape off %}
@@ -100,7 +107,7 @@
             </div><br><br>
           </div><br><br>
 
-          <div class="coin_algo_card_sub">
+          <div class="coin_algo_card_sub" id="SVC">
             <h3>Machine Learning Strategy Models<br>Support Vector Classifier</h3>
             <div class="plot_card">
               {% autoescape off %}
@@ -109,7 +116,7 @@
             </div><br><br>
           </div><br><br>
 
-          <div class="coin_algo_card_sub">
+          <div class="coin_algo_card_sub" id="AdaBoost">
             <h3>Machine Learning Strategy Models<br>AdaBoost Classifier with Gaussian Naive Bayes</h3>
             <div class="plot_card">
               {% autoescape off %}
@@ -119,7 +126,7 @@
           </div><br><br>
           {% endblock %}
 
-          <div class="coin_table_card_sub">
+          <div class="coin_table_card_sub" id="The-Numbers">
             <h3>The Numbers..</h3>
             <table id="coins_table">
               <tr>
@@ -143,6 +150,7 @@
               </tr>
               {% endfor %}
             </table>
+            <p id="The-Last-Numbers">Hey! You made it! <a href="#The-Numbers">Wanna go back?</a></p>
           </div>
         </div>
       </div>

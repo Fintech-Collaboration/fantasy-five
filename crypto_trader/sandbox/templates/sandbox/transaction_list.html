@@ -15,7 +15,7 @@
         flex-direction: column;
         -webkit-box-align: center;
         align-items: center;
-        width: 850px;
+        width: 1200px;
         margin: 0px auto;
         background: powderblue;
         box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
@@ -73,6 +73,8 @@
                 <th>Total Cost (USD)</th>
                 <th>Coin</th>
                 <th>Portfolio</th>
+                <th>Messages</th>
+                <th>Portfolio Balance</th>
                   <th> </th>
                   <th> </th>
               </tr>
@@ -84,6 +86,8 @@
                       <td style="width: 150px">${{ transaction.coin_cost|floatformat:"2"|intcomma }}</td>
                       <td style="width: 90px"d><a href="{% url 'coinpage' transaction.coin %}">{{ transaction.coin }}</a></td>
                       <td style="width: 150px"><a href="{% url 'portfoliolist' %}">{{ transaction.portfolio.nickname }}</a></td>
+                      <td style="width: 150px">{{ transaction.message }}</td>
+                      <td style="width: 150px">${{ transaction.portfolio_balance|floatformat:"2"|intcomma }}</td>
                   </tr>
                 {% endif %}
               {% endfor %}

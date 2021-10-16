@@ -80,7 +80,7 @@ def ohlc_forecast(name="Bitcoin", ticker="BTC", col="price_close"):
         index_col=index_column, 
         parse_dates = True, 
         infer_datetime_format = True
-    )
+    ).sort_index().drop_duplicates()
 
     # Reserve a DF with no Index, if needed
     df_crypto_noIndex = df_crypto.reset_index()
@@ -421,7 +421,7 @@ def ml_cluster_apply(names: str, tickers: str):
         crypto_df = pd.read_csv(
             data_path,
             index_col=f"{ticker}_start_date"
-        )
+        ).sort_index().drop_duplicates()
 
         price_changes = dict()
         price_changes['coin_id'] = name
@@ -432,6 +432,7 @@ def ml_cluster_apply(names: str, tickers: str):
 
         temp_df        = pd.DataFrame(price_changes)
         df_market_data = pd.concat([temp_df, df_market_data]).reset_index(drop=True)
+
     df_market_data = df_market_data.set_index('coin_id').dropna()
 
     # Use the `StandardScaler()` module from scikit-learn to normalize the data from the CSV file

@@ -1,5 +1,6 @@
 {% extends './base.html' %}
 {% load static %}
+{% load humanize %}
 
 <DOCTYPE html>
 <html lang="en">
@@ -83,12 +84,12 @@
                         <td><a href="{% url 'transactioncreate' coin.ticker %}"><button>Buy</button></a></td>
                         <td><a href="{% url 'coinpage' coin.ticker %}">{{ coin.ticker }}</a></td>
                         <td>{{ coin.name }}</td>
-                        <td>${{ coin.price_open }}</td>
-                        <td>${{ coin.price_high }}</td>
-                        <td>${{ coin.price_low }}</td>
-                        <td>${{ coin.price_close }}</td>
-                        <td>{{ coin.volume_traded }}</td>
-                        <td>{{ coin.trades_count }}</td>
+                        <td>${{ coin.price_open|intcomma }}</td>
+                        <td>${{ coin.price_high|intcomma }}</td>
+                        <td>${{ coin.price_low|intcomma }}</td>
+                        <td>${{ coin.price_close|intcomma }}</td>
+                        <td>{{ coin.volume_traded|intcomma }}</td>
+                        <td>{{ coin.trades_count|intcomma }}</td>
                     </tr>
                 {% endfor %}
                 </table>
