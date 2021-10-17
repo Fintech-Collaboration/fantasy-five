@@ -1,5 +1,4 @@
 import os
-from django.db import models
 
 import pandas as pd
 
@@ -13,7 +12,8 @@ def icon_path(ticker):
     return f"img/{ticker.lower()}-icon-64x64.png"
 
 
-def get_coin_data(name, ticker):
+def get_coin_data(name: str, ticker: str):
+    name      = "".join(name.split(" "))
     data_file = os.path.join(BASE_DIR, "data", f"{name.lower()}_5_year.csv")
 
     df = pd.read_csv(
@@ -23,5 +23,5 @@ def get_coin_data(name, ticker):
         infer_datetime_format=True,
     )
 
-    return df.sort_index(ascending=True)
+    return df.sort_index(ascending=True).drop_duplicates()
 

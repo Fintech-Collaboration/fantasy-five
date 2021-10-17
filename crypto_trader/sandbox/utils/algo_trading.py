@@ -52,7 +52,7 @@ def dmac(df, short=50, long=100):
     return df
 
 
-def ohlc_forecast(name="Bitcoin", ticker="BTC", col="price_close"):
+def ohlc_forecast(df_crypto, col="price_close"):
     """
     sr_ucb_project02_prophet_cryptoforecast_aave.ipynb
 
@@ -66,21 +66,8 @@ def ohlc_forecast(name="Bitcoin", ticker="BTC", col="price_close"):
     ## Install and import the required libraries and dependencies
     """
 
-    name   = name.lower()
-    ticker = ticker.lower()
-
     # Variables
-    data_path        = DATA_PATH(name)
     forecast_period  = 90
-    index_column     = ticker + "_start_date"
-
-    # Set the "Date" column as the Datetime Index.
-    df_crypto = pd.read_csv(
-        data_path, 
-        index_col=index_column, 
-        parse_dates = True, 
-        infer_datetime_format = True
-    ).sort_index().drop_duplicates()
 
     # Reserve a DF with no Index, if needed
     df_crypto_noIndex = df_crypto.reset_index()
@@ -120,21 +107,14 @@ def ohlc_forecast(name="Bitcoin", ticker="BTC", col="price_close"):
     """ ACTUAL price prediction for the Forecast range (set in variable declaration) ... in case we want to show """
     forecast_crypto[['ds', 'yhat', 'yhat_lower', 'yhat_upper']].tail(forecast_period)
 
-    return forecast_crypto, df_crypto
+    return forecast_crypto
 
 
 @set__str__("svc")
-def ml_svc_apply(model: str, name: str, ticker: str, market_cap="midcap"):
-    data_path  = DATA_PATH(name)
+def ml_svc_apply(ohlcv_df: pd.DataFrame, market_cap="midcap"):
     model_path = f"{BASE_DIR}/ml_resources/model_{market_cap.lower()}_svc.pkl"
     
     forecast = pd.read_pickle(model_path)
-    ohlcv_df = pd.read_csv(
-        data_path,
-        index_col=f"{ticker.lower()}_start_date",
-        infer_datetime_format=True,
-        parse_dates=True,
-    ).sort_index().drop_duplicates()
 
     # Filter the date index and close columns
     signals_df = ohlcv_df.loc[:, ["price_close"]]
@@ -203,17 +183,10 @@ def ml_svc_apply(model: str, name: str, ticker: str, market_cap="midcap"):
 
 
 @set__str__("adaboost")
-def ml_adaboost_apply(model: str, name: str, ticker: str):
-    data_path  = DATA_PATH(name)
-    model_path = f"{BASE_DIR}/ml_resources/{ticker.lower()}_{model.lower()}_model.pkl"
+def ml_adaboost_apply(ohlcv_df: pd.DataFrame, ticker: str):
+    model_path = f"{BASE_DIR}/ml_resources/{ticker.lower()}_adaboost_model.pkl"
     
     svm_model = pd.read_pickle(model_path)
-    ohlcv_df  = pd.read_csv(
-        data_path,
-        index_col=f"{ticker.lower()}_start_date",
-        infer_datetime_format=True,
-        parse_dates=True,
-    ).sort_index().drop_duplicates()
 
     # Filter the date index and close columns
     signals_df = ohlcv_df.loc[:, ["price_close"]]
@@ -503,7 +476,6 @@ def ml_cluster_apply(names: str, tickers: str):
         pca_model = KMeans(n_clusters=i, random_state=1)
         pca_model.fit(pca_fit_df)
         inertia.append(pca_model.inertia_)
-
 
     # Create a dictionary with the data to plot the Elbow curve
     pca_elbow_dict = {"k":k, "inertia":inertia}
