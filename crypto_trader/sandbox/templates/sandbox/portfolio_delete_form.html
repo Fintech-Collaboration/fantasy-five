@@ -1,0 +1,11 @@
+{% extends './base.html' %}
+{% block content %}
+<h1 class="page-title" style="color:red">Delete Portfolio</h1>
+<form method="post">
+<div>
+  {% csrf_token %}
+  <p>Are you sure you want to delete "{{ object.nickname }}"?</p>
+  <input type="submit" value="Confirm" />
+</div>
+</form>
+{% endblock %}

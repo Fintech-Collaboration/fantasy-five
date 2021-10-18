@@ -1,0 +1,96 @@
+{% extends './base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block content %}
+<head>
+  <title>Coin List</title>
+
+  <style>
+	.coin_table_card,
+	.cluster_card {
+	  display: flex;
+	  flex-direction: column;
+	  -webkit-box-align: center;
+	  align-items: center;
+	  width: 1200px;
+	  margin: 0px auto;
+	  background: powderblue;
+	  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+	  -webkit-box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+	  -moz-box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+	  border-radius: 5px;
+	}
+	.coin_table_card {
+		padding-top: 20px;
+	}
+	.coin_algo_card_sub {
+		padding-bottom: 5px;
+		margin-top: 20px;
+		margin-bottom: 5px;
+		border-radius: 5px;
+		background: lightpink;
+	}
+	.coin_algo_card_sub {
+		width: 1200px;
+	}
+    .plot_div {
+        width: 100%;
+        border-radius: 5px;
+      }
+
+    #messages{
+        background-color: grey;
+        color: #fff;
+        padding: 10px;
+        margin-top: 10px;
+    }
+	</style>
+</head>
+
+<body>
+	<h1 class="page-title">Select Your Favorite Crypto!</h1>
+
+	<div class="container h-50">
+		<div class="d-flex justify-content-center h-100">
+			<div class="coin_table_card">
+				<table id="coin_table">
+				<tr>
+					<th> </th>
+					<th>Ticker</th>
+					<th>Name</th>
+					<th>Opening Price (USD)</th>
+					<th>24H High (USD)</th>
+					<th>24H Low (USD)</th>
+					<th>Closing Price (USD)</th>
+					<th>Volume</th>
+					<th>Trades</th>
+				</tr> 
+				{% for coin in coin_data|dictsort:"name" %}
+					<tr>
+						<td><a href="{% url 'transactioncreate' coin.ticker %}"><button>Buy</button></a></td>
+						<td><a href="{% url 'coinpage' coin.ticker %}">{{ coin.ticker }}</a></td>
+						<td>{{ coin.name }}</td>
+						<td>${{ coin.price_open|intcomma }}</td>
+						<td>${{ coin.price_high|intcomma }}</td>
+						<td>${{ coin.price_low|intcomma }}</td>
+						<td>${{ coin.price_close|intcomma }}</td>
+						<td>{{ coin.volume_traded|intcomma }}</td>
+						<td>{{ coin.trades_count|intcomma }}</td>
+					</tr>
+				{% endfor %}
+				</table>
+
+				<div class="coin_algo_card_sub">
+					<h3>Cryptos Clustered by Closing Price Variances</h3>
+					<div class="cluster_card">
+					  {% autoescape off %}
+					  <div class="plot_div">{{ ml_cluster_plot }}</div>
+					  {% endautoescape %}
+					</div><br><br>
+				</div><br><br>
+			</div>
+		</div>
+	</div>
+</body>
+{% endblock %}
