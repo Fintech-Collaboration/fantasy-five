@@ -281,6 +281,9 @@ def forecast_plotter(df: pd.DataFrame, name: str, ticker: str, col: str):
     df_forecast = ohlc_forecast(df, col)
     trace_name  = " ".join([s.capitalize() for s in f"{col}".split("_")])
 
+    print(df_forecast)
+    print(df)
+
     x_data            = df_forecast["ds"]
     y_data_y          = df[col]
     y_data_yhat       = df_forecast["yhat"]
@@ -724,4 +727,3 @@ class PortfolioDelete(LoginRequiredMixin, DeleteView):
     template_name = "sandbox/portfolio_delete_form.html"
     success_url   = reverse_lazy("portfoliolist")
 """ -------------- """
-
