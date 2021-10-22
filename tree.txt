@@ -1,0 +1,226 @@
+.
+├── crypto_trader
+│   ├── crypto_trader
+│   │   ├── asgi.py
+│   │   ├── settings.py
+│   │   ├── urls.py
+│   │   ├── wsgi.py
+│   │   └── __init__.py
+│   ├── manage.py
+│   ├── sandbox
+│   │   ├── about.md
+│   │   ├── admin.py
+│   │   ├── apps.py
+│   │   ├── data
+│   │   │   ├── aave_5_year.csv
+│   │   │   ├── aragon_5_year.csv
+│   │   │   ├── augur_5_year.csv
+│   │   │   ├── balancer_5_year.csv
+│   │   │   ├── bitcoin_5_year.csv
+│   │   │   ├── cardano_5_year.csv
+│   │   │   ├── cosmos_5_year.csv
+│   │   │   ├── ethereumclassic_5_year.csv
+│   │   │   ├── ethereum_5_year.csv
+│   │   │   ├── market.csv
+│   │   │   ├── orchid_5_year.csv
+│   │   │   ├── tether_5_year.csv
+│   │   │   ├── tezos_5_year.csv
+│   │   │   ├── top100_ath.csv
+│   │   │   └── trending_coins.csv
+│   │   ├── forms.py
+│   │   ├── management
+│   │   │   └── commands
+│   │   │       ├── boost_model_pickler.py
+│   │   │       ├── load_coin_data.py
+│   │   │       └── svc_model_pickler.py
+│   │   ├── migrations
+│   │   │   ├── 0001_initial.py
+│   │   │   ├── 0002_auto_20211010_2315.py
+│   │   │   ├── 0003_auto_20211010_2321.py
+│   │   │   ├── 0004_auto_20211011_2010.py
+│   │   │   ├── 0005_auto_20211011_2013.py
+│   │   │   ├── 0006_auto_20211011_2037.py
+│   │   │   ├── 0007_auto_20211011_2217.py
+│   │   │   ├── 0008_delete_owner.py
+│   │   │   ├── 0009_auto_20211012_1556.py
+│   │   │   ├── 0010_auto_20211012_1722.py
+│   │   │   ├── 0011_auto_20211012_1750.py
+│   │   │   ├── 0012_auto_20211012_1754.py
+│   │   │   ├── 0013_auto_20211012_1904.py
+│   │   │   ├── 0014_auto_20211012_2350.py
+│   │   │   ├── 0015_auto_20211013_0846.py
+│   │   │   ├── 0016_transaction_message.py
+│   │   │   ├── 0017_transaction_balance.py
+│   │   │   ├── 0018_rename_balance_transaction_portfolio_balance.py
+│   │   │   ├── 0019_forecast.py
+│   │   │   ├── 0020_auto_20211016_2204.py
+│   │   │   └── __init__.py
+│   │   ├── ml_resources
+│   │   │   ├── aave_adaboost_model.pkl
+│   │   │   ├── aave_adaboost_src.txt
+│   │   │   ├── aave_svc_model.pkl
+│   │   │   ├── ada_adaboost_model.pkl
+│   │   │   ├── ada_adaboost_src.txt
+│   │   │   ├── ada_svc_model.pkl
+│   │   │   ├── ant_adaboost_model.pkl
+│   │   │   ├── ant_adaboost_src.txt
+│   │   │   ├── ant_svc_model.pkl
+│   │   │   ├── atom_adaboost_model.pkl
+│   │   │   ├── atom_adaboost_src.txt
+│   │   │   ├── atom_svc_model.pkl
+│   │   │   ├── bal_adaboost_model.pkl
+│   │   │   ├── bal_adaboost_src.txt
+│   │   │   ├── bal_svc_model.pkl
+│   │   │   ├── btc_adaboost_model.pkl
+│   │   │   ├── btc_adaboost_src.txt
+│   │   │   ├── btc_svc_model.pkl
+│   │   │   ├── etc_adaboost_model.pkl
+│   │   │   ├── etc_adaboost_src.txt
+│   │   │   ├── etc_svc_model.pkl
+│   │   │   ├── eth_adaboost_model.pkl
+│   │   │   ├── eth_adaboost_src.txt
+│   │   │   ├── eth_svc_model.pkl
+│   │   │   ├── model_highcap_svc.pkl
+│   │   │   ├── model_lowcap_svc.pkl
+│   │   │   ├── model_midcap_svc.pkl
+│   │   │   ├── oxt_adaboost_model.pkl
+│   │   │   ├── oxt_adaboost_src.txt
+│   │   │   ├── oxt_svc_model.pkl
+│   │   │   ├── rep_adaboost_model.pkl
+│   │   │   ├── rep_adaboost_src.txt
+│   │   │   ├── rep_svc_model.pkl
+│   │   │   ├── usdt_adaboost_model.pkl
+│   │   │   ├── usdt_adaboost_src.txt
+│   │   │   ├── usdt_svc_model.pkl
+│   │   │   ├── xtz_adaboost_model.pkl
+│   │   │   ├── xtz_adaboost_src.txt
+│   │   │   └── xtz_svc_model.pkl
+│   │   ├── models.py
+│   │   ├── static
+│   │   │   ├── img
+│   │   │   │   ├── aave-icon-64x64.png
+│   │   │   │   ├── ada-icon-64x64.png
+│   │   │   │   ├── ant-icon-64x64.png
+│   │   │   │   ├── atom-icon-64x64.png
+│   │   │   │   ├── bal-icon-64x64.png
+│   │   │   │   ├── btc-icon-64x64.png
+│   │   │   │   ├── cqt-icon-64x64.png
+│   │   │   │   ├── crypto_happy_map.png
+│   │   │   │   ├── crypto_value_chart.png
+│   │   │   │   ├── etc-icon-64x64.png
+│   │   │   │   ├── eth-icon-64x64.png
+│   │   │   │   ├── fantasyFive_01.png
+│   │   │   │   ├── fantasyFive_02x.png
+│   │   │   │   ├── jason.jpg
+│   │   │   │   ├── kar-icon-64x64.png
+│   │   │   │   ├── michael.jpg
+│   │   │   │   ├── oxt-icon-64x64.png
+│   │   │   │   ├── rep-icon-64x64.png
+│   │   │   │   ├── saeed.jpg
+│   │   │   │   ├── srini.jpg
+│   │   │   │   ├── usdt-icon-64x64.png
+│   │   │   │   ├── xrp-icon-64x64.png
+│   │   │   │   └── xtz-icon-64x64.png
+│   │   │   └── sandbox
+│   │   │       └── style.css
+│   │   ├── templates
+│   │   │   ├── registration
+│   │   │   │   ├── login.html
+│   │   │   │   └── signup.html
+│   │   │   └── sandbox
+│   │   │       ├── about.html
+│   │   │       ├── base.html
+│   │   │       ├── coinbase.html
+│   │   │       ├── coin_list.html
+│   │   │       ├── coin_page.html
+│   │   │       ├── home.html
+│   │   │       ├── portfolio_create_form.html
+│   │   │       ├── portfolio_delete_form.html
+│   │   │       ├── portfolio_list.html
+│   │   │       ├── portfolio_page.html
+│   │   │       ├── portfolio_update_form.html
+│   │   │       ├── transaction_create.html
+│   │   │       └── transaction_list.html
+│   │   ├── urls.py
+│   │   ├── utils
+│   │   │   ├── algo_trading.py
+│   │   │   └── coin.py
+│   │   ├── views.py
+│   │   └── __init__.py
+│   └── temp-plot.html
+├── LICENSE
+├── notebooks
+│   ├── data_piplines
+│   │   ├── aave
+│   │   │   ├── pics
+│   │   │   │   ├── aave_forecast_priceClose.png
+│   │   │   │   ├── aave_forecast_priceHigh.png
+│   │   │   │   ├── aave_forecast_priceLow.png
+│   │   │   │   ├── aave_forecast_priceOpen.png
+│   │   │   │   ├── aave_heatmap_priceClose.png
+│   │   │   │   ├── aave_heatmap_priceHigh.png
+│   │   │   │   ├── aave_heatmap_priceLow.png
+│   │   │   │   ├── aave_heatmap_priceOpen.png
+│   │   │   │   ├── aave_trend_priceClose.png
+│   │   │   │   ├── aave_trend_priceHigh.png
+│   │   │   │   ├── aave_trend_priceLow.png
+│   │   │   │   └── aave_trend_priceOpen.png
+│   │   │   ├── sr_ucb_project02_prophet_cryptoforecast_aave.ipynb
+│   │   │   └── sr_ucb_project02_prophet_cryptoforecast_aave.py
+│   │   ├── aragon
+│   │   │   ├── sr_ucb_project02_prophet_cryptoforecast_aragon.ipynb
+│   │   │   └── sr_ucb_project02_prophet_cryptoforecast_aragon.py
+│   │   ├── augur
+│   │   │   ├── sr_ucb_project02_prophet_cryptoforecast_augur.ipynb
+│   │   │   └── sr_ucb_project02_prophet_cryptoforecast_augur.py
+│   │   ├── balancer
+│   │   │   ├── sr_ucb_project02_prophet_cryptoforecast_balancer.ipynb
+│   │   │   └── sr_ucb_project02_prophet_cryptoforecast_balancer.py
+│   │   ├── bitcoin
+│   │   │   ├── sr_ucb_project02_prophet_cryptoforecast_bitcoin.ipynb
+│   │   │   └── sr_ucb_project02_prophet_cryptoforecast_bitcoin.py
+│   │   ├── cardano
+│   │   │   ├── sr_ucb_project02_prophet_cryptoforecast_cardano.ipynb
+│   │   │   └── sr_ucb_project02_prophet_cryptoforecast_cardano.py
+│   │   ├── cosmos
+│   │   │   ├── sr_ucb_project02_prophet_cryptoforecast_cosmos.ipynb
+│   │   │   └── sr_ucb_project02_prophet_cryptoforecast_cosmos.py
+│   │   ├── ethereum
+│   │   │   ├── sr_ucb_project02_prophet_cryptoforecast_ethereum.ipynb
+│   │   │   └── sr_ucb_project02_prophet_cryptoforecast_ethereum.py
+│   │   ├── ethereumC
+│   │   │   ├── sr_ucb_project02_prophet_cryptoforecast_ethereumC.ipynb
+│   │   │   └── sr_ucb_project02_prophet_cryptoforecast_ethereumc.py
+│   │   ├── orchid
+│   │   │   ├── sr_ucb_project02_prophet_cryptoforecast_orchid.ipynb
+│   │   │   └── sr_ucb_project02_prophet_cryptoforecast_orchid.py
+│   │   ├── tether
+│   │   │   ├── sr_ucb_project02_prophet_cryptoforecast_tether.ipynb
+│   │   │   └── sr_ucb_project02_prophet_cryptoforecast_tether.py
+│   │   └── tezos
+│   │       ├── sr_ucb_project02_prophet_cryptoforecast_tezos.ipynb
+│   │       └── sr_ucb_project02_prophet_cryptoforecast_tezos.py
+│   ├── ml_models
+│   │   ├── aave_mtlb.ipynb
+│   │   ├── aragon_mtlb.ipynb
+│   │   ├── balancer_mtlb.ipynb
+│   │   ├── bitcoin_mltb.ipynb
+│   │   ├── cardano_mtlb.ipynb
+│   │   ├── cosmos_mltb.ipynb
+│   │   └── crypto_cluster.ipynb
+│   └── timeseries
+│       ├── AAVE_2017-2021.ipynb
+│       ├── Aragon_2017-2021.ipynb
+│       ├── Augur_2017-2021.ipynb
+│       ├── Balancer_2017-2021.ipynb
+│       ├── Bitcoin_2017-2021.ipynb
+│       ├── Cardano_2017-2021.ipynb
+│       ├── Cosmos_2017-2021.ipynb
+│       ├── Ethereum_2017-2021.ipynb
+│       ├── Ethereum_Classic_2017-2021.ipynb
+│       ├── Orchid_2017-2021.ipynb
+│       ├── Tether_2017-2021.ipynb
+│       └── Tezos_2017-2021.ipynb
+├── README.md
+├── requirments.txt
+└── tree.txt

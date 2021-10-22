@@ -1,0 +1,91 @@
+{% extends './base.html' %}
+{% load static %}
+
+<DOCTYPE html>
+<html lang="en">
+
+{% block content %}
+	<head>
+		<title>Signup</title>
+
+		<style>
+			.portfolio_card,
+			.portfolio_card_sub {
+				display: flex;
+				flex-direction: column;
+				-webkit-box-align: center;
+				align-items: center;
+				width: 400px;
+				margin: 20px auto;
+				background: powderblue;
+				box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+				-webkit-box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+				-moz-box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+				border-radius: 5px;
+
+			}
+			.portfolio_card_sub {
+				width: 400px;
+				padding-bottom: 20px;
+				background-color: lightpink;
+			}
+			.portfolio_nickname_label,
+			.portfolio_balance_label {
+				margin-bottom: 2px;
+				float: left;
+			}
+			.portfolio_nickname_input,
+			.portfolio_balance_input {
+				margin-bottom: 2px;
+				float: right;
+			}
+			.submit_btn {
+				margin-top: 12px;
+			}
+			#messages{
+				background-color: grey;
+				color: #fff;
+				padding: 10px;
+				margin-top: 10px;
+			}
+		</style>
+	</head>
+
+	<body>
+		<h1 class="page-title">Create Your Portfolio</h1>
+
+		<div class="container h-50">
+			<div class="d-flex justify-content-center h-100">
+				<div class="portfolio_card">		
+					<div class="portfolio_card_sub">
+						<form method="POST">
+							<h3>Create Portfolio</h3>
+							{% csrf_token %}
+							<div class="portfolio_nickname_label">{{ form.nickname.label }}</div>
+							<div class="portfolio_nickname_input">{{ form.nickname }}</div><br>
+							<div class="portfolio_balance_label">{{ form.balance.label }} (USD)&nbsp;&nbsp;&nbsp;&nbsp;</div>
+							<div class="portfolio_balance_input">{{ form.balance }}</div><br><br>
+							<div class="submit_container">
+								<input class="btn submit_btn" type="submit" value="Submit" />
+							</div>
+						</form>
+					</div>
+					{{ form.errors }}
+					{% for message in messages %}
+						<p id="messages">{{ message }}</p>
+					{% endfor %}
+				</div>
+			</div>
+		</div>
+	
+		<script>
+			var form_fields = document.getElementsByTagName('input')
+			form_fields[1].placeholder='"Bob" is a good name..';
+			form_fields[2].placeholder='USD..';
+
+			for (var field in form_fields){	
+			form_fields[field].className += ' form-control'
+			}
+		</script>
+	</body>
+{% endblock %}
